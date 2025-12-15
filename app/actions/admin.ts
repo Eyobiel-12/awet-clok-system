@@ -217,6 +217,60 @@ export async function updateRestaurantLocation(lat: number, lng: number, radiusM
   return { error: null, success: true }
 }
 
+export async function clockOutEmployee(shiftId: string, clockOutTime?: string) {
+  const supabase = await createClient()
+
+  // Verify admin role
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return { error: "Not authenticated", success: false }
+  }
+
+  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single()
+
+  if (profile?.role !== "admin") {
+    return { error: "Unauthorized", success: false }
+  }
+
+  // Get the shift
+  const { data: shift, error: shiftError } = await supabase
+    .from("shifts")
+    .select("*")
+    .eq("id", shiftId)
+    .single()
+
+  if (shiftError || !shift) {
+    return { error: "Shift not found", success: false }
+  }
+
+  if (shift.clock_out) {
+    return { error: "Shift already clocked out", success: false }
+  }
+
+  // Calculate duration
+  const clockIn = new Date(shift.clock_in)
+  const clockOut = clockOutTime ? new Date(clockOutTime) : new Date()
+  const durationMinutes = Math.round((clockOut.getTime() - clockIn.getTime()) / 60000)
+
+  // Update shift
+  const { error: updateError } = await supabase
+    .from("shifts")
+    .update({
+      clock_out: clockOut.toISOString(),
+      duration_minutes: durationMinutes,
+    })
+    .eq("id", shiftId)
+
+  if (updateError) {
+    return { error: updateError.message, success: false }
+  }
+
+  revalidatePath("/admin")
+  return { error: null, success: true }
+}
+
 export async function updateShift(shiftId: string, clockIn: string, clockOut: string | null) {
   const supabase = await createClient()
 

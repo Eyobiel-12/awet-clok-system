@@ -2,11 +2,25 @@
 
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { Clock, User, MapPin, Activity } from "lucide-react"
+import { Clock, User, MapPin, Activity, LogOut, AlertTriangle } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { Shift, Profile } from "@/lib/types"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { clockOutEmployee } from "@/app/actions/admin"
+import { toast } from "sonner"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 interface ActiveShiftsProps {
   initialShifts: Shift[]
@@ -119,6 +133,32 @@ export function ActiveShifts({ initialShifts, profiles }: ActiveShiftsProps) {
     return profile?.name || "Onbekend"
   }
 
+  const getShiftDuration = (clockIn: string) => {
+    const now = new Date()
+    const start = new Date(clockIn)
+    const diff = now.getTime() - start.getTime()
+    const hours = Math.floor(diff / (1000 * 60 * 60))
+    return hours
+  }
+
+  const isLongShift = (clockIn: string) => {
+    return getShiftDuration(clockIn) >= 12 // 12 hours or more
+  }
+
+  const handleClockOut = async (shiftId: string, employeeName: string) => {
+    setIsLoading(true)
+    const result = await clockOutEmployee(shiftId)
+    
+    if (result.error) {
+      toast.error(`Kon ${employeeName} niet uitklokken: ${result.error}`)
+    } else {
+      toast.success(`${employeeName} is uitgelogd`)
+      // Remove from active shifts
+      setActiveShifts((prev) => prev.filter((s) => s.id !== shiftId))
+    }
+    setIsLoading(false)
+  }
+
   if (activeShifts.length === 0) {
     return (
       <Card>
@@ -183,9 +223,48 @@ export function ActiveShifts({ initialShifts, profiles }: ActiveShiftsProps) {
                   </div>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="text-2xl font-bold text-primary tabular-nums">{calculateElapsed(shift.clock_in)}</p>
-                <p className="text-xs text-muted-foreground">sinds start</p>
+              <div className="text-right flex items-center gap-3">
+                <div>
+                  <p className="text-2xl font-bold text-primary tabular-nums">{calculateElapsed(shift.clock_in)}</p>
+                  <p className="text-xs text-muted-foreground">sinds start</p>
+                  {isLongShift(shift.clock_in) && (
+                    <div className="flex items-center gap-1 mt-1 text-warning text-xs">
+                      <AlertTriangle className="w-3 h-3" />
+                      <span>Lang shift!</span>
+                    </div>
+                  )}
+                </div>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <LogOut className="w-4 h-4" />
+                      Uitklokken
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Medewerker uitklokken?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Weet je zeker dat je {getEmployeeName(shift)} wilt uitklokken? 
+                        Deze actie kan niet ongedaan worden gemaakt.
+                        <br />
+                        <br />
+                        <strong>Shift duur:</strong> {calculateElapsed(shift.clock_in)}
+                        <br />
+                        <strong>Gestart om:</strong> {formatTime(shift.clock_in)}
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Annuleren</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handleClockOut(shift.id, getEmployeeName(shift))}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        Uitklokken
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </div>
           ))}

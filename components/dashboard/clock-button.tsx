@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { clockIn, clockOut } from "@/app/actions/shifts"
-import { Play, Square, MapPin, AlertCircle, Loader2, RefreshCw, CheckCircle2, Clock } from "lucide-react"
+import { Play, Square, MapPin, AlertCircle, Loader2, RefreshCw, CheckCircle2, Clock, AlertTriangle } from "lucide-react"
 import { toast } from "sonner"
 import type { Shift, Restaurant } from "@/lib/types"
 import { isWithinRadius, calculateDistance } from "@/lib/geolocation"
@@ -185,6 +185,12 @@ export function ClockButton({ activeShift: initialShift, restaurant }: ClockButt
                 Gestart om{" "}
                 {new Date(activeShift.clock_in).toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" })}
               </p>
+              {isLongShift && (
+                <div className="mt-3 flex items-center justify-center gap-2 text-warning bg-warning/10 px-3 py-2 rounded-lg border border-warning/20">
+                  <AlertTriangle className="w-4 h-4" />
+                  <span className="text-sm font-medium">Lang shift! Vergeet niet uit te klokken</span>
+                </div>
+              )}
             </>
           ) : (
             <>
