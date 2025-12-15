@@ -56,12 +56,19 @@ A modern, mobile-first time tracking application built with Next.js 16, React 19
 
 3. **Set up environment variables**
    
-   Create a `.env.local` file in the root directory:
+   Copy `.env.example` to `.env.local`:
+   ```bash
+   cp .env.example .env.local
+   ```
+   
+   Then edit `.env.local` with your Supabase credentials:
    ```env
    NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key  # Optional
    ```
+   
+   **Get your credentials from**: [Supabase Dashboard](https://supabase.com/dashboard) → Settings → API
 
 4. **Set up Supabase Database**
    
