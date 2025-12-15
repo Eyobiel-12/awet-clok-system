@@ -191,9 +191,9 @@ export async function updateRestaurantLocation(lat: number, lng: number, radiusM
     const { error } = await supabase
       .from("restaurant")
       .update({
-        latitude: lat,
-        longitude: lng,
-        radius_meters: radiusM,
+        lat: lat,
+        lng: lng,
+        radius_m: radiusM,
       })
       .eq("id", existing.id)
 
@@ -202,9 +202,10 @@ export async function updateRestaurantLocation(lat: number, lng: number, radiusM
     }
   } else {
     const { error } = await supabase.from("restaurant").insert({
-      latitude: lat,
-      longitude: lng,
-      radius_meters: radiusM,
+      name: "Massawa Restaurant",
+      lat: lat,
+      lng: lng,
+      radius_m: radiusM,
     })
 
     if (error) {
