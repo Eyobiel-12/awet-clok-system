@@ -102,6 +102,9 @@ export function ClockButton({ activeShift: initialShift, restaurant }: ClockButt
     return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
   }
 
+  // Check if shift is long (12+ hours)
+  const isLongShift = activeShift ? Math.floor(elapsedTime / 3600) >= 12 : false
+
   const handleClockIn = async () => {
     if (!location) {
       toast.error("Locatie is vereist om in te klokken")
