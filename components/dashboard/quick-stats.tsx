@@ -56,7 +56,7 @@ export const QuickStats = memo(function QuickStats({ shifts }: QuickStatsProps) 
   }, [safeShifts])
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 w-full">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 w-full">
       <StatCard icon={Clock} label="Uren deze maand" value={`${stats.monthlyHours}u`} subValue={`${stats.monthlyMinutes % 60}m`} />
       <StatCard icon={Calendar} label="Shifts deze maand" value={stats.monthlyShifts.toString()} subValue="shifts" />
       <StatCard icon={TrendingUp} label="Gem. shift duur" value={`${stats.avgHours}u`} subValue={`${stats.avgMins}m`} />
@@ -77,16 +77,16 @@ const StatCard = memo(function StatCard({
   subValue: string
 }) {
   return (
-    <div className="rounded-xl border border-border bg-gradient-to-br from-card to-card/50 p-4 sm:p-5 hover:bg-card hover:border-border/80 hover:shadow-md active:scale-[0.98] transition-all duration-200 touch-manipulation group">
-      <div className="flex items-center gap-2 text-muted-foreground mb-3">
-        <div className="w-8 h-8 rounded-lg bg-primary/10 group-hover:bg-primary/20 flex items-center justify-center transition-colors">
-          <Icon className="w-4 h-4 text-primary" />
+    <div className="rounded-xl border border-border bg-gradient-to-br from-card to-card/50 p-3 sm:p-4 md:p-5 hover:bg-card hover:border-border/80 hover:shadow-md active:scale-[0.98] transition-all duration-200 touch-manipulation group">
+      <div className="flex items-center gap-2 text-muted-foreground mb-2 sm:mb-3">
+        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-primary/10 group-hover:bg-primary/20 flex items-center justify-center transition-colors flex-shrink-0">
+          <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
         </div>
-        <span className="text-xs font-semibold uppercase tracking-wide truncate">{label}</span>
+        <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wide truncate line-clamp-2">{label}</span>
       </div>
-      <p className="text-2xl sm:text-3xl font-bold tabular-nums mb-1">
+      <p className="text-xl sm:text-2xl md:text-3xl font-bold tabular-nums mb-0.5 sm:mb-1">
         {value}
-        <span className="text-base font-normal text-muted-foreground ml-1.5">{subValue}</span>
+        <span className="text-sm sm:text-base font-normal text-muted-foreground ml-1 sm:ml-1.5">{subValue}</span>
       </p>
     </div>
   )

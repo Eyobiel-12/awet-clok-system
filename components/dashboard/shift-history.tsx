@@ -87,25 +87,25 @@ export const ShiftHistory = memo(function ShiftHistory({ shifts }: ShiftHistoryP
     <div className="space-y-6">
       {/* Stats Row */}
       <div className="grid grid-cols-2 gap-3 sm:gap-4">
-        <div className="rounded-xl border border-border bg-gradient-to-br from-card to-card/50 p-4 sm:p-5 hover:shadow-md active:scale-[0.98] transition-all duration-200 touch-manipulation group">
-          <div className="flex items-center gap-2 text-muted-foreground mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 group-hover:bg-primary/20 flex items-center justify-center transition-colors">
-              <Calendar className="w-4 h-4 text-primary" />
+        <div className="rounded-xl border border-border bg-gradient-to-br from-card to-card/50 p-3 sm:p-4 md:p-5 hover:shadow-md active:scale-[0.98] transition-all duration-200 touch-manipulation group">
+          <div className="flex items-center gap-2 text-muted-foreground mb-2 sm:mb-3">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-primary/10 group-hover:bg-primary/20 flex items-center justify-center transition-colors flex-shrink-0">
+              <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
             </div>
-            <span className="text-xs font-semibold uppercase tracking-wide">Vandaag</span>
+            <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wide">Vandaag</span>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold tabular-nums">
+          <p className="text-xl sm:text-2xl md:text-3xl font-bold tabular-nums">
             {todayStats.todayHours}u {todayStats.todayMins}m
           </p>
         </div>
-        <div className="rounded-xl border border-border bg-gradient-to-br from-card to-card/50 p-4 sm:p-5 hover:shadow-md active:scale-[0.98] transition-all duration-200 touch-manipulation group">
-          <div className="flex items-center gap-2 text-muted-foreground mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 group-hover:bg-primary/20 flex items-center justify-center transition-colors">
-              <TrendingUp className="w-4 h-4 text-primary" />
+        <div className="rounded-xl border border-border bg-gradient-to-br from-card to-card/50 p-3 sm:p-4 md:p-5 hover:shadow-md active:scale-[0.98] transition-all duration-200 touch-manipulation group">
+          <div className="flex items-center gap-2 text-muted-foreground mb-2 sm:mb-3">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-primary/10 group-hover:bg-primary/20 flex items-center justify-center transition-colors flex-shrink-0">
+              <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
             </div>
-            <span className="text-xs font-semibold uppercase tracking-wide">Deze Week</span>
+            <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wide">Deze Week</span>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold tabular-nums">
+          <p className="text-xl sm:text-2xl md:text-3xl font-bold tabular-nums">
             {weeklyStats.weeklyHours}u {weeklyStats.weeklyMins}m
           </p>
         </div>
