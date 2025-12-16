@@ -163,91 +163,114 @@ export function ReportsPanel({ shifts, profiles }: ReportsPanelProps) {
   }
 
   return (
-    <div className="space-y-6">
-      <Tabs defaultValue="general" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="general">Algemeen Rapport</TabsTrigger>
-          <TabsTrigger value="weekly">Week Rapport</TabsTrigger>
+    <div className="space-y-4 sm:space-y-6 w-full">
+      <Tabs defaultValue="general" className="space-y-4 sm:space-y-6">
+        <TabsList className="grid w-full grid-cols-2 h-auto p-1">
+          <TabsTrigger value="general" className="text-xs sm:text-sm py-2 sm:py-2.5">
+            Algemeen Rapport
+          </TabsTrigger>
+          <TabsTrigger value="weekly" className="text-xs sm:text-sm py-2 sm:py-2.5">
+            Week Rapport
+          </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="general" className="space-y-6">
+        <TabsContent value="general" className="space-y-4 sm:space-y-6">
           {/* Filters */}
-          <Card>
-        <CardHeader>
-          <CardTitle>Rapport Filters</CardTitle>
-          <CardDescription>Selecteer een periode voor het rapport</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-4">
-            <div>
-              <Label>Periode</Label>
-              <Select value={dateRange} onValueChange={setDateRange}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="today">Vandaag</SelectItem>
-                  <SelectItem value="week">Deze Week</SelectItem>
-                  <SelectItem value="month">Deze Maand</SelectItem>
-                  <SelectItem value="custom">Aangepast</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            {dateRange === "custom" && (
-              <>
-                <div>
-                  <Label>Van</Label>
-                  <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+          <Card className="border-border/50 shadow-sm">
+            <CardHeader className="pb-3 sm:pb-4">
+              <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
+                <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                Rapport Filters
+              </CardTitle>
+              <CardDescription className="text-xs sm:text-sm">Selecteer een periode voor het rapport</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="sm:col-span-1">
+                  <Label className="text-xs sm:text-sm mb-2 block">Periode</Label>
+                  <Select value={dateRange} onValueChange={setDateRange}>
+                    <SelectTrigger className="h-10 sm:h-11">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="today">Vandaag</SelectItem>
+                      <SelectItem value="week">Deze Week</SelectItem>
+                      <SelectItem value="month">Deze Maand</SelectItem>
+                      <SelectItem value="custom">Aangepast</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-                <div>
-                  <Label>Tot</Label>
-                  <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+                {dateRange === "custom" && (
+                  <>
+                    <div className="sm:col-span-1">
+                      <Label className="text-xs sm:text-sm mb-2 block">Van</Label>
+                      <Input 
+                        type="date" 
+                        value={startDate} 
+                        onChange={(e) => setStartDate(e.target.value)}
+                        className="h-10 sm:h-11"
+                      />
+                    </div>
+                    <div className="sm:col-span-1">
+                      <Label className="text-xs sm:text-sm mb-2 block">Tot</Label>
+                      <Input 
+                        type="date" 
+                        value={endDate} 
+                        onChange={(e) => setEndDate(e.target.value)}
+                        className="h-10 sm:h-11"
+                      />
+                    </div>
+                  </>
+                )}
+                <div className={`flex items-end ${dateRange === "custom" ? "sm:col-span-1" : "sm:col-span-2 lg:col-span-1"}`}>
+                  <Button onClick={handleExport} className="w-full h-10 sm:h-11 gap-2">
+                    <Download className="w-4 h-4" />
+                    <span className="text-xs sm:text-sm">Export CSV</span>
+                  </Button>
                 </div>
-              </>
-            )}
-            <div className="flex items-end">
-              <Button onClick={handleExport} className="w-full">
-                <Download className="w-4 h-4 mr-2" />
-                Export CSV
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+              </div>
+            </CardContent>
+          </Card>
 
       {/* Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Totaal Uren</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <Card className="bg-gradient-to-br from-card to-card/50 border-border/50 hover:shadow-md transition-all duration-200">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 sm:pb-3">
+            <CardTitle className="text-xs sm:text-sm font-medium">Totaal Uren</CardTitle>
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardContent className="pt-0">
+            <div className="text-xl sm:text-2xl font-bold tabular-nums mb-1">
               {totalHours}u {totalMins}m
             </div>
             <p className="text-xs text-muted-foreground">{completedShifts.length} shifts</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Medewerkers</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+        <Card className="bg-gradient-to-br from-card to-card/50 border-border/50 hover:shadow-md transition-all duration-200">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 sm:pb-3">
+            <CardTitle className="text-xs sm:text-sm font-medium">Medewerkers</CardTitle>
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{profiles.length}</div>
+          <CardContent className="pt-0">
+            <div className="text-xl sm:text-2xl font-bold tabular-nums mb-1">{profiles.length}</div>
             <p className="text-xs text-muted-foreground">actieve medewerkers</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Gem. Shift</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+        <Card className="bg-gradient-to-br from-card to-card/50 border-border/50 hover:shadow-md transition-all duration-200">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 sm:pb-3">
+            <CardTitle className="text-xs sm:text-sm font-medium">Gem. Shift</CardTitle>
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+              <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardContent className="pt-0">
+            <div className="text-xl sm:text-2xl font-bold tabular-nums mb-1">
               {completedShifts.length > 0
                 ? `${Math.floor(totalMinutes / completedShifts.length / 60)}u ${Math.floor((totalMinutes / completedShifts.length) % 60)}m`
                 : "0u 0m"}
@@ -256,153 +279,232 @@ export function ReportsPanel({ shifts, profiles }: ReportsPanelProps) {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Shifts</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+        <Card className="bg-gradient-to-br from-card to-card/50 border-border/50 hover:shadow-md transition-all duration-200">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 sm:pb-3">
+            <CardTitle className="text-xs sm:text-sm font-medium">Shifts</CardTitle>
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{completedShifts.length}</div>
+          <CardContent className="pt-0">
+            <div className="text-xl sm:text-2xl font-bold tabular-nums mb-1">{completedShifts.length}</div>
             <p className="text-xs text-muted-foreground">voltooide shifts</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Charts */}
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Uren per Medewerker</CardTitle>
-            <CardDescription>Gewerkte uren per medewerker</CardDescription>
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
+        <Card className="border-border/50 shadow-sm overflow-hidden">
+          <CardHeader className="pb-3 sm:pb-4">
+            <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+              <Users className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+              Uren per Medewerker
+            </CardTitle>
+            <CardDescription className="text-xs sm:text-sm">Gewerkte uren per medewerker</CardDescription>
           </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={employeeHours.filter((e) => e.hours > 0)}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="hours" fill="hsl(var(--primary))" />
-              </BarChart>
-            </ResponsiveContainer>
+          <CardContent className="pt-0">
+            <div className="w-full" style={{ height: '280px' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={employeeHours.filter((e) => e.hours > 0)} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                  <XAxis 
+                    dataKey="name" 
+                    tick={{ fontSize: 12 }}
+                    angle={-45}
+                    textAnchor="end"
+                    height={60}
+                  />
+                  <YAxis tick={{ fontSize: 12 }} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'hsl(var(--popover))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px',
+                      fontSize: '12px'
+                    }}
+                  />
+                  <Bar dataKey="hours" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Uren per Dag</CardTitle>
-            <CardDescription>Laatste 7 dagen</CardDescription>
+        <Card className="border-border/50 shadow-sm overflow-hidden">
+          <CardHeader className="pb-3 sm:pb-4">
+            <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+              Uren per Dag
+            </CardTitle>
+            <CardDescription className="text-xs sm:text-sm">Laatste 7 dagen</CardDescription>
           </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={dailyData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="day" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="hours" stroke="hsl(var(--primary))" strokeWidth={2} />
-              </LineChart>
-            </ResponsiveContainer>
+          <CardContent className="pt-0">
+            <div className="w-full" style={{ height: '280px' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={dailyData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                  <XAxis dataKey="day" tick={{ fontSize: 12 }} />
+                  <YAxis tick={{ fontSize: 12 }} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'hsl(var(--popover))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px',
+                      fontSize: '12px'
+                    }}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="hours" 
+                    stroke="hsl(var(--primary))" 
+                    strokeWidth={2}
+                    dot={{ fill: 'hsl(var(--primary))', r: 4 }}
+                    activeDot={{ r: 6 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
           </CardContent>
         </Card>
       </div>
         </TabsContent>
 
-        <TabsContent value="weekly" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
+        <TabsContent value="weekly" className="space-y-4 sm:space-y-6">
+          <Card className="border-border/50 shadow-sm">
+            <CardHeader className="pb-3 sm:pb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                 <div>
-                  <CardTitle>Week Rapport</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="text-lg sm:text-xl flex items-center gap-2 mb-1">
+                    <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                    Week Rapport
+                  </CardTitle>
+                  <CardDescription className="text-xs sm:text-sm">
                     Week van {currentWeekStart.toLocaleDateString("nl-NL")} tot{" "}
                     {currentWeekEnd.toLocaleDateString("nl-NL")}
                   </CardDescription>
                 </div>
-                <Button onClick={handleExportWeekly}>
-                  <FileText className="w-4 h-4 mr-2" />
-                  Export Week Rapport
+                <Button onClick={handleExportWeekly} className="w-full sm:w-auto gap-2 h-10 sm:h-11">
+                  <FileText className="w-4 h-4" />
+                  <span className="text-xs sm:text-sm">Export Week Rapport</span>
                 </Button>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-3 mb-6">
-                <div className="rounded-lg border border-border bg-card p-4">
-                  <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-2">
-                    <Clock className="w-4 h-4" />
+            <CardContent className="space-y-4 sm:space-y-6">
+              <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3">
+                <div className="rounded-xl border border-border/50 bg-gradient-to-br from-card to-card/50 p-4 sm:p-5 hover:shadow-md transition-all duration-200">
+                  <div className="flex items-center gap-2 text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
+                    </div>
                     Totaal Uren
                   </div>
-                  <div className="text-2xl font-bold">
+                  <div className="text-xl sm:text-2xl font-bold tabular-nums mb-1">
                     {weeklyHours}u {weeklyMins}m
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">{weeklyShifts.length} shifts</p>
+                  <p className="text-xs text-muted-foreground">{weeklyShifts.length} shifts</p>
                 </div>
 
-                <div className="rounded-lg border border-border bg-card p-4">
-                  <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-2">
-                    <Users className="w-4 h-4" />
+                <div className="rounded-xl border border-border/50 bg-gradient-to-br from-card to-card/50 p-4 sm:p-5 hover:shadow-md transition-all duration-200">
+                  <div className="flex items-center gap-2 text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
+                    </div>
                     Actieve Medewerkers
                   </div>
-                  <div className="text-2xl font-bold">
+                  <div className="text-xl sm:text-2xl font-bold tabular-nums mb-1">
                     {weeklyEmployeeReport.filter((e) => e.hours > 0).length}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">hebben gewerkt</p>
+                  <p className="text-xs text-muted-foreground">hebben gewerkt</p>
                 </div>
 
-                <div className="rounded-lg border border-border bg-card p-4">
-                  <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-2">
-                    <TrendingUp className="w-4 h-4" />
+                <div className="rounded-xl border border-border/50 bg-gradient-to-br from-card to-card/50 p-4 sm:p-5 hover:shadow-md transition-all duration-200">
+                  <div className="flex items-center gap-2 text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
+                    </div>
                     Gem. per Medewerker
                   </div>
-                  <div className="text-2xl font-bold">
+                  <div className="text-xl sm:text-2xl font-bold tabular-nums mb-1">
                     {weeklyEmployeeReport.filter((e) => e.hours > 0).length > 0
                       ? `${Math.round((weeklyMinutes / 60 / weeklyEmployeeReport.filter((e) => e.hours > 0).length) * 10) / 10}u`
                       : "0u"}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">gemiddeld</p>
+                  <p className="text-xs text-muted-foreground">gemiddeld</p>
                 </div>
               </div>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Uren per Medewerker - Deze Week</CardTitle>
+              <Card className="border-border/50 shadow-sm overflow-hidden">
+                <CardHeader className="pb-3 sm:pb-4">
+                  <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+                    <Users className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                    Uren per Medewerker - Deze Week
+                  </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={weeklyEmployeeReport.filter((e) => e.hours > 0)}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Bar dataKey="hours" fill="hsl(var(--primary))" />
-                    </BarChart>
-                  </ResponsiveContainer>
+                <CardContent className="pt-0">
+                  <div className="w-full" style={{ height: '280px' }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart 
+                        data={weeklyEmployeeReport.filter((e) => e.hours > 0)} 
+                        margin={{ top: 5, right: 10, left: 0, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                        <XAxis 
+                          dataKey="name" 
+                          tick={{ fontSize: 12 }}
+                          angle={-45}
+                          textAnchor="end"
+                          height={60}
+                        />
+                        <YAxis tick={{ fontSize: 12 }} />
+                        <Tooltip 
+                          contentStyle={{ 
+                            backgroundColor: 'hsl(var(--popover))',
+                            border: '1px solid hsl(var(--border))',
+                            borderRadius: '8px',
+                            fontSize: '12px'
+                          }}
+                        />
+                        <Bar dataKey="hours" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Week Overzicht per Medewerker</CardTitle>
+              <Card className="border-border/50 shadow-sm">
+                <CardHeader className="pb-3 sm:pb-4">
+                  <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+                    <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                    Week Overzicht per Medewerker
+                  </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
+                <CardContent className="pt-0">
+                  <div className="space-y-2 sm:space-y-3">
                     {weeklyEmployeeReport
                       .sort((a, b) => b.hours - a.hours)
                       .map((emp) => (
                         <div
                           key={emp.name}
-                          className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50"
+                          className="flex items-center justify-between p-3 sm:p-4 border border-border/50 rounded-xl hover:bg-muted/50 hover:border-border transition-all duration-200 active:scale-[0.98]"
                         >
-                          <div>
-                            <p className="font-semibold">{emp.name}</p>
-                            <p className="text-sm text-muted-foreground">{emp.shifts} shift{emp.shifts !== 1 ? "s" : ""}</p>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-sm sm:text-base truncate">{emp.name}</p>
+                            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+                              {emp.shifts} shift{emp.shifts !== 1 ? "s" : ""}
+                            </p>
                           </div>
-                          <div className="text-right">
-                            <p className="text-2xl font-bold">{emp.hours}u</p>
+                          <div className="text-right flex-shrink-0 ml-4">
+                            <p className="text-xl sm:text-2xl font-bold tabular-nums">{emp.hours}u</p>
                             <p className="text-xs text-muted-foreground">{emp.minutes} minuten</p>
                           </div>
                         </div>
                       ))}
+                    {weeklyEmployeeReport.length === 0 && (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <p className="text-sm">Geen data voor deze week</p>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
