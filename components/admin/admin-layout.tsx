@@ -35,6 +35,7 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { useTheme } from "next-themes"
 import type { Profile } from "@/lib/types"
+import Image from "next/image"
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -100,11 +101,17 @@ export function AdminLayout({ children, profile }: AdminLayoutProps) {
       <Sidebar>
         <SidebarHeader className="border-b border-sidebar-border">
           <div className="flex items-center gap-2 px-2 py-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <Shield className="w-5 h-5 text-primary-foreground" />
+            <div className="w-8 h-8 rounded-lg overflow-hidden border border-border flex-shrink-0">
+              <Image
+                src="/massawa-logo.jpeg"
+                alt="Massawa Logo"
+                width={32}
+                height={32}
+                className="object-cover w-full h-full"
+              />
             </div>
-            <div className="flex flex-col">
-              <span className="text-sm font-semibold">Massawa</span>
+            <div className="flex flex-col min-w-0">
+              <span className="text-sm font-semibold truncate">Massawa</span>
               <span className="text-xs text-muted-foreground">Admin Panel</span>
             </div>
           </div>

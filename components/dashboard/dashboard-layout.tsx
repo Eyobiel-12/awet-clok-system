@@ -37,6 +37,7 @@ import { useEffect, useState } from "react"
 import { useTheme } from "next-themes"
 import { cn } from "@/lib/utils"
 import type { Profile } from "@/lib/types"
+import Image from "next/image"
 
 interface DashboardLayoutProps {
   children: React.ReactNode
@@ -95,12 +96,24 @@ export function DashboardLayout({ children, profile }: DashboardLayoutProps) {
       <Sidebar>
         <SidebarHeader className="border-b border-sidebar-border bg-sidebar/50 backdrop-blur-sm">
           <div className="flex items-center gap-2.5 px-3 py-3">
-            <Avatar className="w-10 h-10 border-2 border-border shadow-md">
-              <AvatarImage src={profile.avatar_url || undefined} alt={profile.name} />
-              <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary text-sm font-bold">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
+            {profile.avatar_url ? (
+              <Avatar className="w-10 h-10 border-2 border-border shadow-md">
+                <AvatarImage src={profile.avatar_url} alt={profile.name} />
+                <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary text-sm font-bold">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+            ) : (
+              <div className="w-10 h-10 rounded-lg overflow-hidden border-2 border-border shadow-md flex-shrink-0">
+                <Image
+                  src="/massawa-logo.jpeg"
+                  alt="Massawa Logo"
+                  width={40}
+                  height={40}
+                  className="object-cover w-full h-full"
+                />
+              </div>
+            )}
             <div className="flex flex-col min-w-0 flex-1">
               <span className="text-sm font-bold truncate">{profile.name}</span>
               <span className="text-xs text-muted-foreground font-medium capitalize">{profile.role}</span>

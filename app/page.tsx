@@ -2,7 +2,7 @@ import type React from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
-import { MapPin, Shield, Users, ChevronRight, Zap } from "lucide-react"
+import { Clock, MapPin, Shield, Users, ChevronRight, Zap } from "lucide-react"
 
 export default function HomePage() {
   return (
@@ -62,7 +62,7 @@ export default function HomePage() {
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center pt-2 sm:pt-4 px-4 sm:px-0">
               <Button size="lg" className="h-12 sm:h-14 px-6 sm:px-8 text-base sm:text-lg active:scale-95 transition-transform touch-manipulation" asChild>
                 <Link href="/auth/sign-up">
-                  Start nu gratis
+                  Registreren
                   <ChevronRight className="w-4 h-4 ml-2" />
                 </Link>
               </Button>
