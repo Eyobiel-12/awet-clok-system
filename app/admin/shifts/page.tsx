@@ -16,9 +16,9 @@ export default async function AdminShiftsPage() {
     redirect("/auth/login")
   }
 
-  const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
+  const { data: profile, error: profileError } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle()
 
-  if (!profile || profile.role !== "admin") {
+  if (profileError || !profile || profile.role !== "admin") {
     redirect("/dashboard")
   }
 
