@@ -49,26 +49,31 @@ const menuItems = [
     title: "Dashboard",
     url: "/admin",
     icon: Shield,
+    shortcut: "D",
   },
   {
     title: "Shifts",
     url: "/admin/shifts",
     icon: Clock,
+    shortcut: "S",
   },
   {
     title: "Medewerkers",
     url: "/admin/employees",
     icon: Users,
+    shortcut: "M",
   },
   {
     title: "Rapporten",
     url: "/admin/reports",
     icon: BarChart3,
+    shortcut: "R",
   },
   {
     title: "Instellingen",
     url: "/admin/settings",
     icon: Settings,
+    shortcut: "I",
   },
 ]
 
@@ -100,14 +105,14 @@ export function AdminLayout({ children, profile }: AdminLayoutProps) {
     <SidebarProvider>
       <Sidebar>
         <SidebarHeader className="border-b border-sidebar-border">
-          <div className="flex items-center gap-2 px-2 py-2">
-            <div className="w-8 h-8 rounded-lg overflow-hidden border border-border flex-shrink-0">
+          <div className="flex items-center gap-2 px-2 py-2 group/header">
+            <div className="w-8 h-8 rounded-lg overflow-hidden border border-border flex-shrink-0 transition-all duration-300 group-hover/header:scale-110 group-hover/header:shadow-md">
               <Image
                 src="/massawa-logo.jpeg"
                 alt="Massawa Logo"
                 width={32}
                 height={32}
-                className="object-cover w-full h-full"
+                className="object-cover w-full h-full transition-transform duration-300"
               />
             </div>
             <div className="flex flex-col min-w-0">
@@ -122,15 +127,27 @@ export function AdminLayout({ children, profile }: AdminLayoutProps) {
             <SidebarGroupLabel>Admin Navigatie</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {menuItems.map((item) => {
+                {menuItems.map((item, index) => {
                   const Icon = item.icon
                   const isActive = pathname === item.url || (item.url === "/admin" && pathname === "/admin")
                   return (
                     <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton asChild isActive={isActive} tooltip={item.title}>
-                        <Link href={item.url}>
-                          <Icon className="w-4 h-4" />
+                      <SidebarMenuButton
+                        asChild
+                        isActive={isActive}
+                        tooltip={`${item.title} (⌘${item.shortcut})`}
+                        className="group/menu"
+                      >
+                        <Link
+                          href={item.url}
+                          className="relative animate-slide-in"
+                          style={{ animationDelay: `${index * 50}ms` }}
+                        >
+                          <Icon className="w-4 h-4 transition-transform duration-300 group-hover/menu:scale-110 group-hover/menu:rotate-3" />
                           <span>{item.title}</span>
+                          {isActive && (
+                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full animate-pulse-slow" />
+                          )}
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -163,15 +180,17 @@ export function AdminLayout({ children, profile }: AdminLayoutProps) {
           {mounted ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="w-full justify-start gap-2 h-auto py-2">
-                  <Avatar className="w-8 h-8">
-                    <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">{initials}</AvatarFallback>
+                <Button variant="ghost" className="w-full justify-start gap-2 h-auto py-2 hover:bg-sidebar-accent transition-all duration-200 group/user">
+                  <Avatar className="w-8 h-8 transition-transform duration-300 group-hover/user:scale-110">
+                    <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium transition-colors duration-300 group-hover/user:bg-primary/20">
+                      {initials}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col items-start flex-1 min-w-0">
                     <span className="text-sm font-medium truncate w-full">{profile.name}</span>
                     <span className="text-xs text-muted-foreground capitalize">{profile.role}</span>
                   </div>
-                  <ChevronDown className="w-4 h-4 text-muted-foreground ml-auto" />
+                  <ChevronDown className="w-4 h-4 text-muted-foreground ml-auto transition-transform duration-300 group-hover/user:rotate-180" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56" side="right">
@@ -223,14 +242,14 @@ export function AdminLayout({ children, profile }: AdminLayoutProps) {
             variant="ghost"
             size="icon"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="h-9 w-9 active:scale-95 transition-transform touch-manipulation"
+            className="h-9 w-9 active:scale-95 transition-all duration-300 touch-manipulation hover:bg-accent hover:rotate-180"
             aria-label="Toggle theme"
           >
             {mounted ? (
               theme === "dark" ? (
-                <Sun className="h-4 w-4" />
+                <Sun className="h-4 w-4 transition-transform duration-300" />
               ) : (
-                <Moon className="h-4 w-4" />
+                <Moon className="h-4 w-4 transition-transform duration-300" />
               )
             ) : (
               <Sun className="h-4 w-4" />

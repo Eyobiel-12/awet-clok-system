@@ -6,6 +6,8 @@ import { ActiveShifts } from "@/components/admin/active-shifts"
 import { ShiftsTable } from "@/components/admin/shifts-table"
 import { EmployeesTable } from "@/components/admin/employees-table"
 import { SettingsCard } from "@/components/admin/settings-card"
+import { QuickActions } from "@/components/admin/quick-actions"
+import { ActivityFeed } from "@/components/admin/activity-feed"
 import { getAllShifts, getAllProfiles, getActiveShifts } from "@/app/actions/admin"
 import { getRestaurantLocation } from "@/app/actions/shifts"
 
@@ -72,6 +74,9 @@ export default async function AdminPage() {
           <p className="text-sm sm:text-base text-muted-foreground">Beheer medewerkers, shifts en instellingen</p>
         </div>
 
+        {/* Quick Actions */}
+        <QuickActions />
+
         {/* Stats Overview */}
         <StatsCards shifts={shifts} profiles={profiles} />
 
@@ -86,9 +91,12 @@ export default async function AdminPage() {
               <ShiftsTable shifts={shifts.slice(0, 10)} />
             </div>
           </div>
-          <div>
-            <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Medewerkers Overzicht</h2>
-            <EmployeesTable profiles={profiles} shifts={shifts} />
+          <div className="space-y-4 sm:space-y-6">
+            <div>
+              <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Medewerkers Overzicht</h2>
+              <EmployeesTable profiles={profiles} shifts={shifts} />
+            </div>
+            <ActivityFeed shifts={shifts} profiles={profiles} />
           </div>
         </div>
       </div>

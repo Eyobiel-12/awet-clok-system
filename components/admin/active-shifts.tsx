@@ -198,16 +198,16 @@ export function ActiveShifts({ initialShifts, profiles }: ActiveShiftsProps) {
           {activeShifts.map((shift) => (
             <div
               key={shift.id}
-              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors"
+              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg border border-border bg-card hover:bg-muted/50 hover:shadow-md hover:border-primary/20 transition-all duration-300 card-lift"
             >
               <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1 min-w-0">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <User className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 animate-pulse-glow">
+                  <User className="w-5 h-5 sm:w-6 sm:h-6 text-primary transition-transform duration-300 group-hover:scale-110" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1 sm:mb-0">
                     <p className="font-semibold text-sm sm:text-base truncate">{getEmployeeName(shift)}</p>
-                    <Badge variant="outline" className="bg-success/10 text-success border-success/20 text-xs w-fit">
+                    <Badge variant="outline" className="bg-success/10 text-success border-success/20 text-xs w-fit animate-pulse-slow">
                       Actief
                     </Badge>
                   </div>

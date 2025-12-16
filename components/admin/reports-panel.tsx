@@ -304,7 +304,7 @@ export function ReportsPanel({ shifts, profiles }: ReportsPanelProps) {
             <CardDescription className="text-xs sm:text-sm">Gewerkte uren per medewerker</CardDescription>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="w-full" style={{ height: '280px' }}>
+            <div className="w-full animate-fade-in" style={{ height: '280px' }}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={employeeHours.filter((e) => e.hours > 0)} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
@@ -323,8 +323,16 @@ export function ReportsPanel({ shifts, profiles }: ReportsPanelProps) {
                       borderRadius: '8px',
                       fontSize: '12px'
                     }}
+                    animationDuration={300}
                   />
-                  <Bar dataKey="hours" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                  <Bar 
+                    dataKey="hours" 
+                    fill="hsl(var(--primary))" 
+                    radius={[4, 4, 0, 0]}
+                    animationBegin={0}
+                    animationDuration={800}
+                    animationEasing="ease-out"
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -340,7 +348,7 @@ export function ReportsPanel({ shifts, profiles }: ReportsPanelProps) {
             <CardDescription className="text-xs sm:text-sm">Laatste 7 dagen</CardDescription>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="w-full" style={{ height: '280px' }}>
+            <div className="w-full animate-fade-in" style={{ height: '280px' }}>
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={dailyData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
@@ -353,6 +361,7 @@ export function ReportsPanel({ shifts, profiles }: ReportsPanelProps) {
                       borderRadius: '8px',
                       fontSize: '12px'
                     }}
+                    animationDuration={300}
                   />
                   <Line 
                     type="monotone" 
@@ -361,6 +370,9 @@ export function ReportsPanel({ shifts, profiles }: ReportsPanelProps) {
                     strokeWidth={2}
                     dot={{ fill: 'hsl(var(--primary))', r: 4 }}
                     activeDot={{ r: 6 }}
+                    animationBegin={0}
+                    animationDuration={800}
+                    animationEasing="ease-out"
                   />
                 </LineChart>
               </ResponsiveContainer>

@@ -15,7 +15,8 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { updateShift, deleteShift } from "@/app/actions/admin"
-import { Pencil, Trash2, Clock, Loader2, Search, Filter } from "lucide-react"
+import { Pencil, Trash2, Clock, Loader2, Search, Filter, ArrowUpDown, ArrowUp, ArrowDown, FileDown } from "lucide-react"
+import { Checkbox as CheckboxComponent } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ExportButton } from "./export-button"
 import { toast } from "sonner"
@@ -34,6 +35,9 @@ interface ShiftsTableProps {
   shifts: ShiftWithProfile[]
 }
 
+type SortField = "employee" | "date" | "start" | "end" | "duration" | null
+type SortDirection = "asc" | "desc" | null
+
 export function ShiftsTable({ shifts }: ShiftsTableProps) {
   const [editingShift, setEditingShift] = useState<ShiftWithProfile | null>(null)
   const [editClockIn, setEditClockIn] = useState("")
@@ -42,6 +46,9 @@ export function ShiftsTable({ shifts }: ShiftsTableProps) {
   const [filterEmployee, setFilterEmployee] = useState("")
   const [filterStatus, setFilterStatus] = useState<"all" | "active" | "completed">("all")
   const [dateFilter, setDateFilter] = useState("all")
+  const [selectedShifts, setSelectedShifts] = useState<Set<string>>(new Set())
+  const [sortField, setSortField] = useState<SortField>(null)
+  const [sortDirection, setSortDirection] = useState<SortDirection>(null)
 
   const filteredShifts = shifts.filter((shift) => {
     // Employee filter
@@ -80,6 +87,124 @@ export function ShiftsTable({ shifts }: ShiftsTableProps) {
 
     return true
   })
+
+  // Sort shifts
+  const sortedShifts = [...filteredShifts].sort((a, b) => {
+    if (!sortField || !sortDirection) return 0
+
+    let comparison = 0
+    switch (sortField) {
+      case "employee":
+        comparison = (a.profiles?.name || "").localeCompare(b.profiles?.name || "")
+        break
+      case "date":
+        comparison = new Date(a.clock_in).getTime() - new Date(b.clock_in).getTime()
+        break
+      case "start":
+        comparison = new Date(a.clock_in).getTime() - new Date(b.clock_in).getTime()
+        break
+      case "end":
+        const aEnd = a.clock_out ? new Date(a.clock_out).getTime() : 0
+        const bEnd = b.clock_out ? new Date(b.clock_out).getTime() : 0
+        comparison = aEnd - bEnd
+        break
+      case "duration":
+        comparison = (a.duration_minutes || 0) - (b.duration_minutes || 0)
+        break
+    }
+
+    return sortDirection === "asc" ? comparison : -comparison
+  })
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      if (sortDirection === "asc") {
+        setSortDirection("desc")
+      } else if (sortDirection === "desc") {
+        setSortField(null)
+        setSortDirection(null)
+      } else {
+        setSortDirection("asc")
+      }
+    } else {
+      setSortField(field)
+      setSortDirection("asc")
+    }
+  }
+
+  const getSortIcon = (field: SortField) => {
+    if (sortField !== field) {
+      return <ArrowUpDown className="w-3.5 h-3.5 ml-1 text-muted-foreground" />
+    }
+    if (sortDirection === "asc") {
+      return <ArrowUp className="w-3.5 h-3.5 ml-1 text-primary" />
+    }
+    return <ArrowDown className="w-3.5 h-3.5 ml-1 text-primary" />
+  }
+
+  const toggleSelectShift = (shiftId: string) => {
+    setSelectedShifts((prev) => {
+      const next = new Set(prev)
+      if (next.has(shiftId)) {
+        next.delete(shiftId)
+      } else {
+        next.add(shiftId)
+      }
+      return next
+    })
+  }
+
+  const toggleSelectAll = () => {
+    if (selectedShifts.size === sortedShifts.length) {
+      setSelectedShifts(new Set())
+    } else {
+      setSelectedShifts(new Set(sortedShifts.map((s) => s.id)))
+    }
+  }
+
+  const handleBulkDelete = async () => {
+    if (selectedShifts.size === 0) return
+    if (!confirm(`Weet je zeker dat je ${selectedShifts.size} shift(s) wilt verwijderen?`)) return
+
+    setIsLoading(true)
+    const deletePromises = Array.from(selectedShifts).map((id) => deleteShift(id))
+    const results = await Promise.allSettled(deletePromises)
+
+    const errors = results.filter((r) => r.status === "rejected")
+    if (errors.length > 0) {
+      toast.error(`${errors.length} shift(s) konden niet worden verwijderd`)
+    } else {
+      toast.success(`${selectedShifts.size} shift(s) verwijderd`)
+      setSelectedShifts(new Set())
+    }
+
+    setIsLoading(false)
+  }
+
+  const handleBulkExport = () => {
+    const selected = sortedShifts.filter((s) => selectedShifts.has(s.id))
+    // Use ExportButton logic here
+    const csv = [
+      ["Employee", "Clock In", "Clock Out", "Duration (minutes)", "Date"].join(","),
+      ...selected.map((shift) => {
+        return [
+          shift.profiles?.name || "Unknown",
+          new Date(shift.clock_in).toISOString(),
+          shift.clock_out ? new Date(shift.clock_out).toISOString() : "",
+          shift.duration_minutes || 0,
+          new Date(shift.clock_in).toLocaleDateString("nl-NL"),
+        ].join(",")
+      }),
+    ].join("\n")
+
+    const blob = new Blob([csv], { type: "text/csv" })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `selected-shifts-${new Date().toISOString().split("T")[0]}.csv`
+    a.click()
+    toast.success(`${selected.length} shift(s) geëxporteerd`)
+  }
 
   const formatDuration = (minutes: number | null) => {
     if (!minutes) return "-"
@@ -184,6 +309,36 @@ export function ShiftsTable({ shifts }: ShiftsTableProps) {
           <div className="mt-2 sm:hidden">
             <ExportButton shifts={filteredShifts} />
           </div>
+          {selectedShifts.size > 0 && (
+            <div className="mt-3 flex items-center justify-between p-3 bg-primary/5 border border-primary/20 rounded-lg">
+              <span className="text-sm font-medium">
+                {selectedShifts.size} shift{selectedShifts.size !== 1 ? "s" : ""} geselecteerd
+              </span>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={handleBulkExport} className="h-8 gap-2">
+                  <FileDown className="w-3.5 h-3.5" />
+                  Export
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleBulkDelete}
+                  disabled={isLoading}
+                  className="h-8 gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+                >
+                  {isLoading ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Trash2 className="w-3.5 h-3.5" />
+                  )}
+                  Verwijder
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => setSelectedShifts(new Set())} className="h-8">
+                  Deselecteer
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Desktop Table View */}
@@ -191,24 +346,85 @@ export function ShiftsTable({ shifts }: ShiftsTableProps) {
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead>Medewerker</TableHead>
-                <TableHead>Datum</TableHead>
-                <TableHead>Start</TableHead>
-                <TableHead>Eind</TableHead>
-                <TableHead>Duur</TableHead>
+                <TableHead className="w-12">
+                  <CheckboxComponent
+                    checked={selectedShifts.size === sortedShifts.length && sortedShifts.length > 0}
+                    onCheckedChange={toggleSelectAll}
+                    className="ripple"
+                  />
+                </TableHead>
+                <TableHead>
+                  <button
+                    onClick={() => handleSort("employee")}
+                    className="flex items-center hover:text-primary transition-colors"
+                  >
+                    Medewerker
+                    {getSortIcon("employee")}
+                  </button>
+                </TableHead>
+                <TableHead>
+                  <button
+                    onClick={() => handleSort("date")}
+                    className="flex items-center hover:text-primary transition-colors"
+                  >
+                    Datum
+                    {getSortIcon("date")}
+                  </button>
+                </TableHead>
+                <TableHead>
+                  <button
+                    onClick={() => handleSort("start")}
+                    className="flex items-center hover:text-primary transition-colors"
+                  >
+                    Start
+                    {getSortIcon("start")}
+                  </button>
+                </TableHead>
+                <TableHead>
+                  <button
+                    onClick={() => handleSort("end")}
+                    className="flex items-center hover:text-primary transition-colors"
+                  >
+                    Eind
+                    {getSortIcon("end")}
+                  </button>
+                </TableHead>
+                <TableHead>
+                  <button
+                    onClick={() => handleSort("duration")}
+                    className="flex items-center hover:text-primary transition-colors"
+                  >
+                    Duur
+                    {getSortIcon("duration")}
+                  </button>
+                </TableHead>
                 <TableHead className="text-right">Acties</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredShifts.length === 0 ? (
+              {sortedShifts.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
+                  <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
                     Geen shifts gevonden
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredShifts.map((shift, index) => (
-                  <TableRow key={shift.id} className={cn(index === 0 && !shift.clock_out && "bg-success/5")}>
+                sortedShifts.map((shift, index) => (
+                  <TableRow
+                    key={shift.id}
+                    className={cn(
+                      "transition-colors hover:bg-muted/50",
+                      index === 0 && !shift.clock_out && "bg-success/5",
+                      selectedShifts.has(shift.id) && "bg-primary/5"
+                    )}
+                  >
+                    <TableCell>
+                      <CheckboxComponent
+                        checked={selectedShifts.has(shift.id)}
+                        onCheckedChange={() => toggleSelectShift(shift.id)}
+                        className="ripple"
+                      />
+                    </TableCell>
                     <TableCell className="font-medium">{shift.profiles?.name || "Onbekend"}</TableCell>
                     <TableCell>
                       {new Date(shift.clock_in).toLocaleDateString("nl-NL", {
@@ -236,17 +452,22 @@ export function ShiftsTable({ shifts }: ShiftsTableProps) {
                     <TableCell className="tabular-nums font-medium">{formatDuration(shift.duration_minutes)}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEdit(shift)}>
-                          <Pencil className="w-4 h-4" />
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 ripple hover:bg-primary/10"
+                          onClick={() => handleEdit(shift)}
+                        >
+                          <Pencil className="w-4 h-4 transition-transform duration-200 hover:scale-110" />
                           <span className="sr-only">Bewerk shift</span>
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                          className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 ripple"
                           onClick={() => handleDelete(shift.id)}
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-4 h-4 transition-transform duration-200 hover:scale-110" />
                           <span className="sr-only">Verwijder shift</span>
                         </Button>
                       </div>
