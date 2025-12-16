@@ -1,15 +1,21 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Clock, Mail } from "lucide-react"
+import Image from "next/image"
+import { Mail } from "lucide-react"
 
 export default function SignUpSuccessPage() {
   return (
     <div className="flex min-h-screen w-full items-center justify-center p-6 bg-background">
       <div className="w-full max-w-sm">
         <div className="flex flex-col gap-6">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-              <Clock className="w-6 h-6 text-primary-foreground" />
-            </div>
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <Image
+              src="/massawa-logo.jpeg"
+              alt="Massawa Logo"
+              width={48}
+              height={48}
+              className="rounded-lg object-contain"
+              priority
+            />
             <span className="text-2xl font-bold">Massawa</span>
           </div>
 

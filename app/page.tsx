@@ -1,7 +1,8 @@
 import type React from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Clock, MapPin, Shield, Users, ChevronRight, Zap } from "lucide-react"
+import Image from "next/image"
+import { MapPin, Shield, Users, ChevronRight, Zap } from "lucide-react"
 
 export default function HomePage() {
   return (
@@ -17,9 +18,14 @@ export default function HomePage() {
         <header className="border-b border-border/50 backdrop-blur-sm bg-background/80 sticky top-0 z-20 animate-fade-in">
           <div className="container mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             <div className="flex items-center gap-2 sm:gap-3">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 bg-primary rounded-lg flex items-center justify-center">
-                <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
-              </div>
+              <Image
+                src="/massawa-logo.jpeg"
+                alt="Massawa Logo"
+                width={36}
+                height={36}
+                className="rounded-lg object-contain"
+                priority
+              />
               <span className="text-base sm:text-lg font-semibold">Massawa</span>
             </div>
             <div className="flex items-center gap-2 sm:gap-3">
