@@ -63,8 +63,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fafafa" },
     { media: "(prefers-color-scheme: dark)", color: "#1a1a1f" },
+    { media: "(prefers-color-scheme: light)", color: "#fafafa" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -79,9 +79,9 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="nl" suppressHydrationWarning className={`h-full ${geist.variable} ${geistMono.variable}`}>
+    <html lang="nl" suppressHydrationWarning className={`h-full dark ${geist.variable} ${geistMono.variable}`}>
       <body className={`font-sans antialiased h-full overflow-x-hidden ${geist.className}`} suppressHydrationWarning>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           {children}
           <Toaster richColors position="top-center" />
         </ThemeProvider>
