@@ -193,7 +193,7 @@ export function AdminLayout({ children, profile }: AdminLayoutProps) {
                   <ChevronDown className="w-4 h-4 text-muted-foreground ml-auto transition-transform duration-300 group-hover/user:rotate-180" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56" side="right">
+              <DropdownMenuContent align="end" className="w-56" side="top">
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium">{profile.name}</p>
