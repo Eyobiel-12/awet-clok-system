@@ -43,14 +43,14 @@ export default async function DashboardPage() {
     <DashboardLayout profile={profile}>
       <div className="space-y-4 sm:space-y-6 animate-fade-in w-full max-w-full">
         {/* Welcome Section */}
-        <div className="bg-gradient-to-r from-card via-card to-muted/20 rounded-xl border border-border p-3 sm:p-4 md:p-6 shadow-sm w-full">
-          <div className="flex items-start justify-between">
-            <div>
+        <div className="bg-gradient-to-r from-card via-card to-muted/20 rounded-xl border border-border p-3 sm:p-4 md:p-6 shadow-sm w-full overflow-hidden">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0">
               <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
                 Welkom terug, {profile.name?.split(" ")[0]}
               </h1>
               <p className="text-sm sm:text-base text-muted-foreground flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
+                <Calendar className="w-4 h-4 flex-shrink-0" />
                 {new Date().toLocaleDateString("nl-NL", {
                   weekday: "long",
                   day: "numeric",
@@ -59,8 +59,8 @@ export default async function DashboardPage() {
                 })}
               </p>
             </div>
-            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center flex-shrink-0">
-              <User className="w-6 h-6 sm:w-7 sm:h-7 text-primary" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center flex-shrink-0 border-2 border-primary/10">
+              <User className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-primary" />
             </div>
           </div>
         </div>
