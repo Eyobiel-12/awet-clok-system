@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Toaster } from "@/components/ui/sonner"
 import { ThemeProvider } from "@/components/theme-provider"
+import { AuthErrorHandler } from "@/components/auth-error-handler"
 import "./globals.css"
 
 const geist = Geist({ 
@@ -82,6 +83,7 @@ export default function RootLayout({
     <html lang="nl" suppressHydrationWarning className={`h-full dark ${geist.variable} ${geistMono.variable}`}>
       <body className={`font-sans antialiased h-full overflow-x-hidden ${geist.className}`} suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+          <AuthErrorHandler />
           {children}
           <Toaster richColors position="top-center" />
         </ThemeProvider>
