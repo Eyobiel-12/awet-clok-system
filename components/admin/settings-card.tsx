@@ -66,18 +66,18 @@ export function SettingsCard({ restaurant }: SettingsCardProps) {
 
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden">
-      <div className="px-6 py-4 border-b border-border">
-        <h3 className="font-semibold flex items-center gap-2">
+      <div className="px-3 sm:px-6 py-3 sm:py-4 border-b border-border">
+        <h3 className="font-semibold flex items-center gap-2 text-sm sm:text-base">
           <MapPin className="w-4 h-4 text-primary" />
           Restaurant Locatie
         </h3>
-        <p className="text-sm text-muted-foreground mt-1">Configureer de locatie en geofence radius</p>
+        <p className="text-xs sm:text-sm text-muted-foreground mt-1">Configureer de locatie en geofence radius</p>
       </div>
 
-      <div className="p-6 space-y-4">
-        <div className="grid grid-cols-2 gap-4">
+      <div className="p-4 sm:p-6 space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="lat">Latitude</Label>
+            <Label htmlFor="lat" className="text-sm">Latitude</Label>
             <Input
               id="lat"
               type="number"
@@ -85,10 +85,11 @@ export function SettingsCard({ restaurant }: SettingsCardProps) {
               placeholder="52.3676"
               value={lat}
               onChange={(e) => setLat(e.target.value)}
+              className="h-11"
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="lng">Longitude</Label>
+            <Label htmlFor="lng" className="text-sm">Longitude</Label>
             <Input
               id="lng"
               type="number"
@@ -96,24 +97,31 @@ export function SettingsCard({ restaurant }: SettingsCardProps) {
               placeholder="4.9041"
               value={lng}
               onChange={(e) => setLng(e.target.value)}
+              className="h-11"
             />
           </div>
         </div>
 
         <div className="grid gap-2">
-          <Label htmlFor="radius">Radius (meters)</Label>
+          <Label htmlFor="radius" className="text-sm">Radius (meters)</Label>
           <Input
             id="radius"
             type="number"
             placeholder="100"
             value={radius}
             onChange={(e) => setRadius(e.target.value)}
+            className="h-11"
           />
           <p className="text-xs text-muted-foreground">Medewerkers kunnen alleen inklokken binnen deze afstand</p>
         </div>
 
-        <div className="flex gap-2 pt-2">
-          <Button variant="outline" onClick={getCurrentLocation} disabled={isGettingLocation}>
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-2 pt-2">
+          <Button 
+            variant="outline" 
+            onClick={getCurrentLocation} 
+            disabled={isGettingLocation}
+            className="w-full sm:w-auto h-11"
+          >
             {isGettingLocation ? (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
             ) : (
@@ -121,7 +129,11 @@ export function SettingsCard({ restaurant }: SettingsCardProps) {
             )}
             Gebruik Huidige Locatie
           </Button>
-          <Button onClick={handleSave} disabled={isLoading || success}>
+          <Button 
+            onClick={handleSave} 
+            disabled={isLoading || success}
+            className="w-full sm:w-auto h-11"
+          >
             {isLoading ? (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
             ) : success ? (

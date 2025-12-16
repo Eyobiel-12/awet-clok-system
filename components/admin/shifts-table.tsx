@@ -138,48 +138,56 @@ export function ShiftsTable({ shifts }: ShiftsTableProps) {
   return (
     <>
       <div className="rounded-xl border border-border bg-card overflow-hidden">
-        <div className="px-6 py-4 border-b border-border flex items-center justify-between">
-          <h3 className="font-semibold flex items-center gap-2">
-            <Clock className="w-4 h-4 text-primary" />
-            Alle Shifts
-          </h3>
-          <div className="flex items-center gap-2 flex-wrap">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Zoek medewerker..."
-                value={filterEmployee}
-                onChange={(e) => setFilterEmployee(e.target.value)}
-                className="pl-9 w-48"
-              />
+        <div className="px-3 sm:px-6 py-3 sm:py-4 border-b border-border">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-2">
+            <h3 className="font-semibold flex items-center gap-2 text-sm sm:text-base">
+              <Clock className="w-4 h-4 text-primary" />
+              Alle Shifts
+            </h3>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2">
+              <div className="relative flex-1 sm:flex-initial">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Zoek medewerker..."
+                  value={filterEmployee}
+                  onChange={(e) => setFilterEmployee(e.target.value)}
+                  className="pl-9 w-full sm:w-48 h-10"
+                />
+              </div>
+              <Select value={filterStatus} onValueChange={(v: "all" | "active" | "completed") => setFilterStatus(v)}>
+                <SelectTrigger className="w-full sm:w-40 h-10">
+                  <Filter className="w-4 h-4 mr-2" />
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle Shifts</SelectItem>
+                  <SelectItem value="active">Actief</SelectItem>
+                  <SelectItem value="completed">Voltooid</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={dateFilter} onValueChange={setDateFilter}>
+                <SelectTrigger className="w-full sm:w-40 h-10">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle Datums</SelectItem>
+                  <SelectItem value="today">Vandaag</SelectItem>
+                  <SelectItem value="week">Deze Week</SelectItem>
+                  <SelectItem value="month">Deze Maand</SelectItem>
+                </SelectContent>
+              </Select>
+              <div className="hidden sm:block">
+                <ExportButton shifts={filteredShifts} />
+              </div>
             </div>
-            <Select value={filterStatus} onValueChange={(v: "all" | "active" | "completed") => setFilterStatus(v)}>
-              <SelectTrigger className="w-40">
-                <Filter className="w-4 h-4 mr-2" />
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Alle Shifts</SelectItem>
-                <SelectItem value="active">Actief</SelectItem>
-                <SelectItem value="completed">Voltooid</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={dateFilter} onValueChange={setDateFilter}>
-              <SelectTrigger className="w-40">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Alle Datums</SelectItem>
-                <SelectItem value="today">Vandaag</SelectItem>
-                <SelectItem value="week">Deze Week</SelectItem>
-                <SelectItem value="month">Deze Maand</SelectItem>
-              </SelectContent>
-            </Select>
+          </div>
+          <div className="mt-2 sm:hidden">
             <ExportButton shifts={filteredShifts} />
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
@@ -249,43 +257,123 @@ export function ShiftsTable({ shifts }: ShiftsTableProps) {
             </TableBody>
           </Table>
         </div>
+
+        {/* Mobile Card View */}
+        <div className="md:hidden p-3 sm:p-4 space-y-3">
+          {filteredShifts.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              Geen shifts gevonden
+            </div>
+          ) : (
+            filteredShifts.map((shift, index) => (
+              <div
+                key={shift.id}
+                className={cn(
+                  "rounded-lg border border-border bg-card p-4 space-y-3",
+                  index === 0 && !shift.clock_out && "bg-success/5 border-success/20"
+                )}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-sm truncate">{shift.profiles?.name || "Onbekend"}</h4>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {new Date(shift.clock_in).toLocaleDateString("nl-NL", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </p>
+                  </div>
+                  {!shift.clock_out && (
+                    <Badge className="bg-success/10 text-success hover:bg-success/20 text-xs">Actief</Badge>
+                  )}
+                </div>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Start</p>
+                    <p className="font-medium tabular-nums">
+                      {new Date(shift.clock_in).toLocaleTimeString("nl-NL", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Eind</p>
+                    <p className="font-medium tabular-nums">
+                      {shift.clock_out ? (
+                        new Date(shift.clock_out).toLocaleTimeString("nl-NL", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between pt-2 border-t border-border">
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Duur</p>
+                    <p className="font-semibold tabular-nums">{formatDuration(shift.duration_minutes)}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => handleEdit(shift)}>
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-9 w-9 text-destructive hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => handleDelete(shift.id)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </div>
 
       <Dialog open={!!editingShift} onOpenChange={() => setEditingShift(null)}>
-        <DialogContent>
+        <DialogContent className="max-w-[95vw] sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Shift Bewerken</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-lg sm:text-xl">Shift Bewerken</DialogTitle>
+            <DialogDescription className="text-sm">
               Pas de start- en eindtijd van de shift aan voor {editingShift?.profiles?.name}
             </DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="clock-in">Start Tijd</Label>
+              <Label htmlFor="clock-in" className="text-sm">Start Tijd</Label>
               <Input
                 id="clock-in"
                 type="datetime-local"
                 value={editClockIn}
                 onChange={(e) => setEditClockIn(e.target.value)}
+                className="h-11"
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="clock-out">Eind Tijd</Label>
+              <Label htmlFor="clock-out" className="text-sm">Eind Tijd</Label>
               <Input
                 id="clock-out"
                 type="datetime-local"
                 value={editClockOut}
                 onChange={(e) => setEditClockOut(e.target.value)}
+                className="h-11"
               />
             </div>
           </div>
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditingShift(null)}>
+          <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setEditingShift(null)} className="w-full sm:w-auto h-11">
               Annuleren
             </Button>
-            <Button onClick={handleSave} disabled={isLoading}>
+            <Button onClick={handleSave} disabled={isLoading} className="w-full sm:w-auto h-11">
               {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
               Opslaan
             </Button>

@@ -63,11 +63,13 @@ export default async function AdminPage() {
 
   return (
     <AdminLayout profile={profile}>
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6 w-full max-w-full">
         {/* Page Header */}
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
-          <p className="text-muted-foreground">Beheer medewerkers, shifts en instellingen</p>
+        <div className="px-1">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+            Admin Dashboard
+          </h1>
+          <p className="text-sm sm:text-base text-muted-foreground">Beheer medewerkers, shifts en instellingen</p>
         </div>
 
         {/* Stats Overview */}
@@ -77,15 +79,15 @@ export default async function AdminPage() {
         <ActiveShifts initialShifts={activeShifts} profiles={profiles} />
 
         {/* Quick Access */}
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
           <div>
-            <h2 className="text-xl font-semibold mb-4">Recente Shifts</h2>
+            <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Recente Shifts</h2>
             <div className="rounded-xl border border-border bg-card overflow-hidden">
               <ShiftsTable shifts={shifts.slice(0, 10)} />
             </div>
           </div>
           <div>
-            <h2 className="text-xl font-semibold mb-4">Medewerkers Overzicht</h2>
+            <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Medewerkers Overzicht</h2>
             <EmployeesTable profiles={profiles} shifts={shifts} />
           </div>
         </div>

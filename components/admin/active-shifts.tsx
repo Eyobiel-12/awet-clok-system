@@ -161,20 +161,20 @@ export function ActiveShifts({ initialShifts, profiles }: ActiveShiftsProps) {
 
   if (activeShifts.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Activity className="w-5 h-5" />
+      <Card className="border-border/50 shadow-sm">
+        <CardHeader className="pb-3 sm:pb-4">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <Activity className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
             Actieve Shifts
           </CardTitle>
-          <CardDescription>Medewerkers die momenteel aan het werk zijn</CardDescription>
+          <CardDescription className="text-xs sm:text-sm">Medewerkers die momenteel aan het werk zijn</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="text-center py-8">
-            <div className="w-16 h-16 rounded-full bg-muted mx-auto mb-4 flex items-center justify-center">
-              <Clock className="w-8 h-8 text-muted-foreground" />
+        <CardContent className="pt-0">
+          <div className="text-center py-6 sm:py-8">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-muted mx-auto mb-3 sm:mb-4 flex items-center justify-center">
+              <Clock className="w-6 h-6 sm:w-8 sm:h-8 text-muted-foreground" />
             </div>
-            <p className="text-muted-foreground">Geen actieve shifts</p>
+            <p className="text-sm sm:text-base text-muted-foreground">Geen actieve shifts</p>
           </div>
         </CardContent>
       </Card>
@@ -182,50 +182,50 @@ export function ActiveShifts({ initialShifts, profiles }: ActiveShiftsProps) {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Activity className="w-5 h-5" />
+    <Card className="border-border/50 shadow-sm">
+      <CardHeader className="pb-3 sm:pb-4">
+        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+          <Activity className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
           Actieve Shifts
           {isLoading && <span className="text-xs text-muted-foreground">(updating...)</span>}
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-xs sm:text-sm">
           {activeShifts.length} medewerker{activeShifts.length !== 1 ? "s" : ""} aan het werk
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-0">
         <div className="space-y-3">
           {activeShifts.map((shift) => (
             <div
               key={shift.id}
-              className="flex items-center justify-between p-4 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors"
+              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors"
             >
-              <div className="flex items-center gap-4 flex-1">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <User className="w-6 h-6 text-primary" />
+              <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <User className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <p className="font-semibold">{getEmployeeName(shift)}</p>
-                    <Badge variant="outline" className="bg-success/10 text-success border-success/20">
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1 sm:mb-0">
+                    <p className="font-semibold text-sm sm:text-base truncate">{getEmployeeName(shift)}</p>
+                    <Badge variant="outline" className="bg-success/10 text-success border-success/20 text-xs w-fit">
                       Actief
                     </Badge>
                   </div>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground mt-1 sm:mt-0">
                     <div className="flex items-center gap-1">
-                      <Clock className="w-4 h-4" />
+                      <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       <span>Gestart: {formatTime(shift.clock_in)}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <MapPin className="w-4 h-4" />
+                      <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       <span>{calculateElapsed(shift.clock_in)}</span>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="text-right flex items-center gap-3">
-                <div>
-                  <p className="text-2xl font-bold text-primary tabular-nums">{calculateElapsed(shift.clock_in)}</p>
+              <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-border">
+                <div className="text-left sm:text-right">
+                  <p className="text-xl sm:text-2xl font-bold text-primary tabular-nums">{calculateElapsed(shift.clock_in)}</p>
                   <p className="text-xs text-muted-foreground">sinds start</p>
                   {isLongShift(shift.clock_in) && (
                     <div className="flex items-center gap-1 mt-1 text-warning text-xs">
@@ -236,15 +236,16 @@ export function ActiveShifts({ initialShifts, profiles }: ActiveShiftsProps) {
                 </div>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button variant="outline" size="sm" className="gap-2">
-                      <LogOut className="w-4 h-4" />
-                      Uitklokken
+                    <Button variant="outline" size="sm" className="gap-2 h-9 sm:h-10 text-xs sm:text-sm">
+                      <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                      <span className="hidden sm:inline">Uitklokken</span>
+                      <span className="sm:hidden">Uit</span>
                     </Button>
                   </AlertDialogTrigger>
-                  <AlertDialogContent>
+                  <AlertDialogContent className="max-w-[95vw] sm:max-w-md">
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Medewerker uitklokken?</AlertDialogTitle>
-                      <AlertDialogDescription>
+                      <AlertDialogTitle className="text-lg sm:text-xl">Medewerker uitklokken?</AlertDialogTitle>
+                      <AlertDialogDescription className="text-sm">
                         Weet je zeker dat je {getEmployeeName(shift)} wilt uitklokken? 
                         Deze actie kan niet ongedaan worden gemaakt.
                         <br />
@@ -254,11 +255,11 @@ export function ActiveShifts({ initialShifts, profiles }: ActiveShiftsProps) {
                         <strong>Gestart om:</strong> {formatTime(shift.clock_in)}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Annuleren</AlertDialogCancel>
+                    <AlertDialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
+                      <AlertDialogCancel className="w-full sm:w-auto h-11">Annuleren</AlertDialogCancel>
                       <AlertDialogAction
                         onClick={() => handleClockOut(shift.id, getEmployeeName(shift))}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        className="w-full sm:w-auto h-11 bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       >
                         Uitklokken
                       </AlertDialogAction>

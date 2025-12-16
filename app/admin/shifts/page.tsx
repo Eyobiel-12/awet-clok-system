@@ -26,10 +26,12 @@ export default async function AdminShiftsPage() {
 
   return (
     <AdminLayout profile={profile}>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Alle Shifts</h1>
-          <p className="text-muted-foreground">Beheer en bekijk alle shifts van medewerkers</p>
+      <div className="space-y-4 sm:space-y-6 w-full max-w-full">
+        <div className="px-1">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+            Alle Shifts
+          </h1>
+          <p className="text-sm sm:text-base text-muted-foreground">Beheer en bekijk alle shifts van medewerkers</p>
         </div>
         <ShiftsTable shifts={shifts} />
       </div>

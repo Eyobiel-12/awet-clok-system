@@ -56,14 +56,15 @@ export function EmployeesTable({ profiles, shifts }: EmployeesTableProps) {
 
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden">
-      <div className="px-6 py-4 border-b border-border">
-        <h3 className="font-semibold flex items-center gap-2">
+      <div className="px-3 sm:px-6 py-3 sm:py-4 border-b border-border">
+        <h3 className="font-semibold flex items-center gap-2 text-sm sm:text-base">
           <Users className="w-4 h-4 text-primary" />
           Medewerkers
         </h3>
       </div>
 
-      <div className="overflow-x-auto">
+      {/* Desktop Table View */}
+      <div className="hidden md:block overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-transparent">
@@ -156,6 +157,95 @@ export function EmployeesTable({ profiles, shifts }: EmployeesTableProps) {
             })}
           </TableBody>
         </Table>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="md:hidden p-3 sm:p-4 space-y-3">
+        {profiles.map((profile) => {
+          const initials =
+            profile.name
+              ?.split(" ")
+              .map((n) => n[0])
+              .join("")
+              .toUpperCase()
+              .slice(0, 2) || "?"
+
+          return (
+            <div key={profile.id} className="rounded-lg border border-border bg-card p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <Avatar className="w-10 h-10 flex-shrink-0">
+                    <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-sm truncate">{profile.name}</h4>
+                    <div className="flex items-center gap-2 mt-1">
+                      {isActive(profile.id) ? (
+                        <Badge className="bg-success/10 text-success hover:bg-success/20 text-xs">Actief</Badge>
+                      ) : (
+                        <Badge variant="secondary" className="text-xs">Inactief</Badge>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Uren (Week)</p>
+                  <p className="font-semibold tabular-nums text-sm">{getEmployeeHours(profile.id)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Rol</p>
+                  <Select
+                    value={profile.role}
+                    onValueChange={(value: "worker" | "admin") => handleRoleChange(profile.id, value)}
+                    disabled={loadingId === profile.id}
+                  >
+                    <SelectTrigger className="w-full h-9 text-xs">
+                      {loadingId === profile.id ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <div className="flex items-center gap-1.5">
+                          {profile.role === "admin" ? (
+                            <Shield className="w-3.5 h-3.5" />
+                          ) : (
+                            <User className="w-3.5 h-3.5" />
+                          )}
+                          <SelectValue />
+                        </div>
+                      )}
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="worker">
+                        <div className="flex items-center gap-2">
+                          <User className="w-3.5 h-3.5" />
+                          Worker
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="admin">
+                        <div className="flex items-center gap-2">
+                          <Shield className="w-3.5 h-3.5" />
+                          Admin
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="flex gap-2 pt-2">
+                <EmployeeDetails profile={profile} shifts={shifts} />
+                <Button variant="outline" size="sm" className="flex-1 h-9" asChild>
+                  <Link href={`/admin/employees/${profile.id}`}>
+                    <TrendingUp className="w-4 h-4 mr-2" />
+                    Inzicht
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          )
+        })}
       </div>
     </div>
   )
