@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
+import { createClient as createAdminClient } from "@supabase/supabase-js"
 
 export async function getAllShifts(startDate?: string, endDate?: string) {
   const supabase = await createClient()
@@ -341,4 +342,222 @@ export async function deleteShift(shiftId: string) {
   revalidatePath("/admin")
   revalidatePath("/admin/shifts")
   return { error: null, success: true }
+}
+
+// Helper function to get admin Supabase client
+async function getAdminClient() {
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+
+  if (!serviceRoleKey || !supabaseUrl) {
+    throw new Error("Service role key or Supabase URL not configured")
+  }
+
+  return createAdminClient(supabaseUrl, serviceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  })
+}
+
+export async function deleteUser(userId: string) {
+  // First verify admin role using regular client
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return { error: "Not authenticated", success: false }
+  }
+
+  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single()
+
+  if (profile?.role !== "admin") {
+    return { error: "Unauthorized", success: false }
+  }
+
+  // Prevent deleting yourself
+  if (user.id === userId) {
+    return { error: "Cannot delete your own account", success: false }
+  }
+
+  // Prevent deleting the last admin
+  const { data: targetProfile } = await supabase.from("profiles").select("role").eq("id", userId).single()
+  if (targetProfile?.role === "admin") {
+    const { data: adminCount } = await supabase
+      .from("profiles")
+      .select("id", { count: "exact", head: true })
+      .eq("role", "admin")
+
+    if (adminCount === 1) {
+      return { error: "Cannot delete the last admin", success: false }
+    }
+  }
+
+  try {
+    // Use admin client to delete user
+    const adminClient = await getAdminClient()
+    const { error: deleteError } = await adminClient.auth.admin.deleteUser(userId)
+
+    if (deleteError) {
+      return { error: deleteError.message, success: false }
+    }
+
+    // Profile will be deleted automatically via CASCADE, but we can also delete shifts
+    const { error: shiftsError } = await supabase.from("shifts").delete().eq("user_id", userId)
+
+    if (shiftsError) {
+      console.error("Error deleting user shifts:", shiftsError)
+      // Don't fail if shifts deletion fails, user is already deleted
+    }
+
+    revalidatePath("/admin/employees")
+    return { error: null, success: true }
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Failed to delete user", success: false }
+  }
+}
+
+export async function banUser(userId: string) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return { error: "Not authenticated", success: false }
+  }
+
+  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single()
+
+  if (profile?.role !== "admin") {
+    return { error: "Unauthorized", success: false }
+  }
+
+  // Prevent banning yourself
+  if (user.id === userId) {
+    return { error: "Cannot ban your own account", success: false }
+  }
+
+  // Prevent banning the last admin
+  const { data: targetProfile } = await supabase.from("profiles").select("role").eq("id", userId).single()
+  if (targetProfile?.role === "admin") {
+    const { data: adminCount } = await supabase
+      .from("profiles")
+      .select("id", { count: "exact", head: true })
+      .eq("role", "admin")
+
+    if (adminCount === 1) {
+      return { error: "Cannot ban the last admin", success: false }
+    }
+  }
+
+  try {
+    // Use admin client to ban user
+    const adminClient = await getAdminClient()
+    const { error: banError } = await adminClient.auth.admin.updateUserById(userId, {
+      ban_duration: "876000h", // ~100 years (effectively permanent)
+    })
+
+    if (banError) {
+      return { error: banError.message, success: false }
+    }
+
+    // Also add banned flag to profile for easier querying
+    const { error: profileError } = await supabase
+      .from("profiles")
+      .update({ banned: true })
+      .eq("id", userId)
+
+    if (profileError) {
+      console.error("Error updating profile banned status:", profileError)
+      // Don't fail if profile update fails, user is already banned
+    }
+
+    revalidatePath("/admin/employees")
+    return { error: null, success: true }
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Failed to ban user", success: false }
+  }
+}
+
+export async function unbanUser(userId: string) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return { error: "Not authenticated", success: false }
+  }
+
+  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single()
+
+  if (profile?.role !== "admin") {
+    return { error: "Unauthorized", success: false }
+  }
+
+  try {
+    // Use admin client to unban user
+    const adminClient = await getAdminClient()
+    const { error: unbanError } = await adminClient.auth.admin.updateUserById(userId, {
+      ban_duration: "0s", // Remove ban
+    })
+
+    if (unbanError) {
+      return { error: unbanError.message, success: false }
+    }
+
+    // Remove banned flag from profile
+    const { error: profileError } = await supabase
+      .from("profiles")
+      .update({ banned: false })
+      .eq("id", userId)
+
+    if (profileError) {
+      console.error("Error updating profile banned status:", profileError)
+      // Don't fail if profile update fails, user is already unbanned
+    }
+
+    revalidatePath("/admin/employees")
+    return { error: null, success: true }
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Failed to unban user", success: false }
+  }
+}
+
+export async function resetUserPassword(userId: string, newPassword: string) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return { error: "Not authenticated", success: false }
+  }
+
+  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single()
+
+  if (profile?.role !== "admin") {
+    return { error: "Unauthorized", success: false }
+  }
+
+  if (newPassword.length < 6) {
+    return { error: "Password must be at least 6 characters", success: false }
+  }
+
+  try {
+    // Use admin client to reset password
+    const adminClient = await getAdminClient()
+    const { error: resetError } = await adminClient.auth.admin.updateUserById(userId, {
+      password: newPassword,
+    })
+
+    if (resetError) {
+      return { error: resetError.message, success: false }
+    }
+
+    revalidatePath("/admin/employees")
+    return { error: null, success: true }
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Failed to reset password", success: false }
+  }
 }

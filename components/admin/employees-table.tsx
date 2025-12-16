@@ -6,8 +6,26 @@ import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { updateUserRole } from "@/app/actions/admin"
-import { Users, Loader2, Shield, User, TrendingUp } from "lucide-react"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { updateUserRole, deleteUser, banUser, unbanUser } from "@/app/actions/admin"
+import { Users, Loader2, Shield, User, TrendingUp, Trash2, Ban, Unlock, MoreVertical } from "lucide-react"
 import { toast } from "sonner"
 import { EmployeeDetails } from "./employee-details"
 import Link from "next/link"
@@ -20,6 +38,7 @@ interface EmployeesTableProps {
 
 export function EmployeesTable({ profiles, shifts }: EmployeesTableProps) {
   const [loadingId, setLoadingId] = useState<string | null>(null)
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null)
 
   const handleRoleChange = async (userId: string, newRole: "worker" | "admin") => {
     setLoadingId(userId)
@@ -32,6 +51,48 @@ export function EmployeesTable({ profiles, shifts }: EmployeesTableProps) {
     }
 
     setLoadingId(null)
+  }
+
+  const handleDelete = async (userId: string, userName: string) => {
+    setActionLoadingId(userId)
+    const result = await deleteUser(userId)
+
+    if (result.error) {
+      toast.error(result.error)
+    } else {
+      toast.success(`${userName} is verwijderd`)
+      window.location.reload()
+    }
+
+    setActionLoadingId(null)
+  }
+
+  const handleBan = async (userId: string, userName: string) => {
+    setActionLoadingId(userId)
+    const result = await banUser(userId)
+
+    if (result.error) {
+      toast.error(result.error)
+    } else {
+      toast.success(`${userName} is geblokkeerd`)
+      window.location.reload()
+    }
+
+    setActionLoadingId(null)
+  }
+
+  const handleUnban = async (userId: string, userName: string) => {
+    setActionLoadingId(userId)
+    const result = await unbanUser(userId)
+
+    if (result.error) {
+      toast.error(result.error)
+    } else {
+      toast.success(`${userName} is gedeblokkeerd`)
+      window.location.reload()
+    }
+
+    setActionLoadingId(null)
   }
 
   const now = new Date()
@@ -98,11 +159,18 @@ export function EmployeesTable({ profiles, shifts }: EmployeesTableProps) {
                     </div>
                   </TableCell>
                   <TableCell>
-                    {isActive(profile.id) ? (
-                      <Badge className="bg-success/10 text-success hover:bg-success/20">Actief</Badge>
-                    ) : (
-                      <Badge variant="secondary">Inactief</Badge>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {isActive(profile.id) ? (
+                        <Badge className="bg-success/10 text-success hover:bg-success/20">Actief</Badge>
+                      ) : (
+                        <Badge variant="secondary">Inactief</Badge>
+                      )}
+                      {profile.banned && (
+                        <Badge variant="destructive" className="bg-destructive/10 text-destructive hover:bg-destructive/20">
+                          Geblokkeerd
+                        </Badge>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell className="tabular-nums font-medium">{getEmployeeHours(profile.id)}</TableCell>
                   <TableCell>
@@ -150,6 +218,108 @@ export function EmployeesTable({ profiles, shifts }: EmployeesTableProps) {
                           Inzicht
                         </Link>
                       </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" disabled={actionLoadingId === profile.id}>
+                            {actionLoadingId === profile.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <MoreVertical className="w-4 h-4" />
+                            )}
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          {profile.banned ? (
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <DropdownMenuItem
+                                  onSelect={(e) => e.preventDefault()}
+                                  className="text-success cursor-pointer"
+                                >
+                                  <Unlock className="w-4 h-4 mr-2" />
+                                  Deb lokkeer
+                                </DropdownMenuItem>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Gebruiker deb lokkeren?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Weet je zeker dat je {profile.name} wilt deb lokkeren? Ze kunnen dan weer inloggen.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Annuleren</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleUnban(profile.id, profile.name)}
+                                    className="bg-success hover:bg-success/90"
+                                  >
+                                    Deb lokkeer
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          ) : (
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <DropdownMenuItem
+                                  onSelect={(e) => e.preventDefault()}
+                                  className="text-destructive cursor-pointer"
+                                >
+                                  <Ban className="w-4 h-4 mr-2" />
+                                  Blokkeer
+                                </DropdownMenuItem>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Gebruiker blokkeren?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Weet je zeker dat je {profile.name} wilt blokkeren? Ze kunnen dan niet meer inloggen.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Annuleren</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleBan(profile.id, profile.name)}
+                                    className="bg-destructive hover:bg-destructive/90"
+                                  >
+                                    Blokkeer
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          )}
+                          <DropdownMenuSeparator />
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <DropdownMenuItem
+                                onSelect={(e) => e.preventDefault()}
+                                className="text-destructive cursor-pointer"
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Verwijder
+                              </DropdownMenuItem>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Gebruiker verwijderen?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Weet je zeker dat je {profile.name} wilt verwijderen? Deze actie kan niet ongedaan
+                                  worden gemaakt. Alle data van deze gebruiker wordt permanent verwijderd.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Annuleren</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => handleDelete(profile.id, profile.name)}
+                                  className="bg-destructive hover:bg-destructive/90"
+                                >
+                                  Verwijder
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -181,11 +351,16 @@ export function EmployeesTable({ profiles, shifts }: EmployeesTableProps) {
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <h4 className="font-semibold text-sm truncate">{profile.name}</h4>
-                    <div className="flex items-center gap-2 mt-1">
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
                       {isActive(profile.id) ? (
                         <Badge className="bg-success/10 text-success hover:bg-success/20 text-xs">Actief</Badge>
                       ) : (
                         <Badge variant="secondary" className="text-xs">Inactief</Badge>
+                      )}
+                      {profile.banned && (
+                        <Badge variant="destructive" className="bg-destructive/10 text-destructive hover:bg-destructive/20 text-xs">
+                          Geblokkeerd
+                        </Badge>
                       )}
                     </div>
                   </div>
@@ -242,6 +417,108 @@ export function EmployeesTable({ profiles, shifts }: EmployeesTableProps) {
                     Inzicht
                   </Link>
                 </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" disabled={actionLoadingId === profile.id}>
+                      {actionLoadingId === profile.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <MoreVertical className="w-4 h-4" />
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    {profile.banned ? (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <DropdownMenuItem
+                            onSelect={(e) => e.preventDefault()}
+                            className="text-success cursor-pointer"
+                          >
+                            <Unlock className="w-4 h-4 mr-2" />
+                            Deb lokkeer
+                          </DropdownMenuItem>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Gebruiker deb lokkeren?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Weet je zeker dat je {profile.name} wilt deb lokkeren? Ze kunnen dan weer inloggen.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Annuleren</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleUnban(profile.id, profile.name)}
+                              className="bg-success hover:bg-success/90"
+                            >
+                              Deb lokkeer
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    ) : (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <DropdownMenuItem
+                            onSelect={(e) => e.preventDefault()}
+                            className="text-destructive cursor-pointer"
+                          >
+                            <Ban className="w-4 h-4 mr-2" />
+                            Blokkeer
+                          </DropdownMenuItem>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Gebruiker blokkeren?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Weet je zeker dat je {profile.name} wilt blokkeren? Ze kunnen dan niet meer inloggen.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Annuleren</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleBan(profile.id, profile.name)}
+                              className="bg-destructive hover:bg-destructive/90"
+                            >
+                              Blokkeer
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
+                    <DropdownMenuSeparator />
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <DropdownMenuItem
+                          onSelect={(e) => e.preventDefault()}
+                          className="text-destructive cursor-pointer"
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Verwijder
+                        </DropdownMenuItem>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Gebruiker verwijderen?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Weet je zeker dat je {profile.name} wilt verwijderen? Deze actie kan niet ongedaan worden
+                            gemaakt. Alle data van deze gebruiker wordt permanent verwijderd.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Annuleren</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDelete(profile.id, profile.name)}
+                            className="bg-destructive hover:bg-destructive/90"
+                          >
+                            Verwijder
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
           )

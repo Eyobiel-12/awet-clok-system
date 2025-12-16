@@ -3,6 +3,7 @@ export interface Profile {
   name: string
   role: "worker" | "admin"
   avatar_url?: string | null
+  banned?: boolean
   created_at: string
 }
 
