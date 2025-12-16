@@ -24,8 +24,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { updateUserRole, deleteUser, banUser, unbanUser } from "@/app/actions/admin"
-import { Users, Loader2, Shield, User, TrendingUp, Trash2, Ban, Unlock, MoreVertical } from "lucide-react"
+import { updateUserRole, deleteUser, banUser, unbanUser, updateUserName } from "@/app/actions/admin"
+import { Users, Loader2, Shield, User, TrendingUp, Trash2, Ban, Unlock, MoreVertical, Edit } from "lucide-react"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 import { EmployeeDetails } from "./employee-details"
 import Link from "next/link"
@@ -39,6 +50,8 @@ interface EmployeesTableProps {
 export function EmployeesTable({ profiles, shifts }: EmployeesTableProps) {
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null)
+  const [editingNameId, setEditingNameId] = useState<string | null>(null)
+  const [newName, setNewName] = useState("")
 
   const handleRoleChange = async (userId: string, newRole: "worker" | "admin") => {
     setLoadingId(userId)
@@ -89,6 +102,31 @@ export function EmployeesTable({ profiles, shifts }: EmployeesTableProps) {
       toast.error(result.error)
     } else {
       toast.success(`${userName} is gedeblokkeerd`)
+      window.location.reload()
+    }
+
+    setActionLoadingId(null)
+  }
+
+  const handleEditName = (profile: Profile) => {
+    setEditingNameId(profile.id)
+    setNewName(profile.name)
+  }
+
+  const handleSaveName = async (userId: string) => {
+    if (!newName.trim()) {
+      toast.error("Naam is verplicht")
+      return
+    }
+
+    setActionLoadingId(userId)
+    const result = await updateUserName(userId, newName.trim())
+
+    if (result.error) {
+      toast.error(result.error)
+    } else {
+      toast.success("Naam bijgewerkt")
+      setEditingNameId(null)
       window.location.reload()
     }
 
@@ -229,6 +267,60 @@ export function EmployeesTable({ profiles, shifts }: EmployeesTableProps) {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                          <Dialog open={editingNameId === profile.id} onOpenChange={(open) => !open && setEditingNameId(null)}>
+                            <DialogTrigger asChild>
+                              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                <Edit className="w-4 h-4 mr-2" />
+                                Naam wijzigen
+                              </DropdownMenuItem>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>Naam wijzigen</DialogTitle>
+                                <DialogDescription>Wijzig de naam van {profile.name}</DialogDescription>
+                              </DialogHeader>
+                              <div className="space-y-4 py-4">
+                                <div className="space-y-2">
+                                  <Label htmlFor="name">Naam</Label>
+                                  <Input
+                                    id="name"
+                                    value={newName}
+                                    onChange={(e) => setNewName(e.target.value)}
+                                    placeholder="Volledige naam"
+                                    disabled={actionLoadingId === profile.id}
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Enter" && !actionLoadingId) {
+                                        handleSaveName(profile.id)
+                                      }
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                              <DialogFooter>
+                                <Button
+                                  variant="outline"
+                                  onClick={() => setEditingNameId(null)}
+                                  disabled={actionLoadingId === profile.id}
+                                >
+                                  Annuleren
+                                </Button>
+                                <Button
+                                  onClick={() => handleSaveName(profile.id)}
+                                  disabled={actionLoadingId === profile.id || !newName.trim()}
+                                >
+                                  {actionLoadingId === profile.id ? (
+                                    <>
+                                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                      Opslaan...
+                                    </>
+                                  ) : (
+                                    "Opslaan"
+                                  )}
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+                          <DropdownMenuSeparator />
                           {profile.banned ? (
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
@@ -428,6 +520,60 @@ export function EmployeesTable({ profiles, shifts }: EmployeesTableProps) {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
+                    <Dialog open={editingNameId === profile.id} onOpenChange={(open) => !open && setEditingNameId(null)}>
+                      <DialogTrigger asChild>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                          <Edit className="w-4 h-4 mr-2" />
+                          Naam wijzigen
+                        </DropdownMenuItem>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Naam wijzigen</DialogTitle>
+                          <DialogDescription>Wijzig de naam van {profile.name}</DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4 py-4">
+                          <div className="space-y-2">
+                            <Label htmlFor={`name-${profile.id}`}>Naam</Label>
+                            <Input
+                              id={`name-${profile.id}`}
+                              value={newName}
+                              onChange={(e) => setNewName(e.target.value)}
+                              placeholder="Volledige naam"
+                              disabled={actionLoadingId === profile.id}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" && !actionLoadingId) {
+                                  handleSaveName(profile.id)
+                                }
+                              }}
+                            />
+                          </div>
+                        </div>
+                        <DialogFooter>
+                          <Button
+                            variant="outline"
+                            onClick={() => setEditingNameId(null)}
+                            disabled={actionLoadingId === profile.id}
+                          >
+                            Annuleren
+                          </Button>
+                          <Button
+                            onClick={() => handleSaveName(profile.id)}
+                            disabled={actionLoadingId === profile.id || !newName.trim()}
+                          >
+                            {actionLoadingId === profile.id ? (
+                              <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Opslaan...
+                              </>
+                            ) : (
+                              "Opslaan"
+                            )}
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                    <DropdownMenuSeparator />
                     {profile.banned ? (
                       <AlertDialog>
                         <AlertDialogTrigger asChild>

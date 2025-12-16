@@ -561,3 +561,53 @@ export async function resetUserPassword(userId: string, newPassword: string) {
     return { error: error instanceof Error ? error.message : "Failed to reset password", success: false }
   }
 }
+
+export async function updateUserName(userId: string, newName: string) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return { error: "Not authenticated", success: false }
+  }
+
+  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single()
+
+  if (profile?.role !== "admin") {
+    return { error: "Unauthorized", success: false }
+  }
+
+  // Validate name
+  if (!newName || newName.trim().length === 0) {
+    return { error: "Naam is verplicht", success: false }
+  }
+
+  if (newName.length > 100) {
+    return { error: "Naam is te lang (max 100 karakters)", success: false }
+  }
+
+  const trimmedName = newName.trim()
+
+  // Update profile name
+  const { error } = await supabase.from("profiles").update({ name: trimmedName }).eq("id", userId)
+
+  if (error) {
+    return { error: error.message, success: false }
+  }
+
+  // Also update user metadata in auth.users
+  try {
+    const adminClient = await getAdminClient()
+    await adminClient.auth.admin.updateUserById(userId, {
+      user_metadata: {
+        name: trimmedName,
+      },
+    })
+  } catch (error) {
+    console.error("Error updating user metadata:", error)
+    // Don't fail if metadata update fails, profile is already updated
+  }
+
+  revalidatePath("/admin/employees")
+  return { error: null, success: true }
+}
