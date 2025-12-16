@@ -267,13 +267,16 @@ export function EmployeesTable({ profiles, shifts }: EmployeesTableProps) {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onSelect={(e) => {
+                              e.preventDefault()
+                              handleEditName(profile)
+                            }}
+                          >
+                            <Edit className="w-4 h-4 mr-2" />
+                            Naam wijzigen
+                          </DropdownMenuItem>
                           <Dialog open={editingNameId === profile.id} onOpenChange={(open) => !open && setEditingNameId(null)}>
-                            <DialogTrigger asChild>
-                              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                                <Edit className="w-4 h-4 mr-2" />
-                                Naam wijzigen
-                              </DropdownMenuItem>
-                            </DialogTrigger>
                             <DialogContent>
                               <DialogHeader>
                                 <DialogTitle>Naam wijzigen</DialogTitle>
@@ -520,13 +523,16 @@ export function EmployeesTable({ profiles, shifts }: EmployeesTableProps) {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
+                    <DropdownMenuItem
+                      onSelect={(e) => {
+                        e.preventDefault()
+                        handleEditName(profile)
+                      }}
+                    >
+                      <Edit className="w-4 h-4 mr-2" />
+                      Naam wijzigen
+                    </DropdownMenuItem>
                     <Dialog open={editingNameId === profile.id} onOpenChange={(open) => !open && setEditingNameId(null)}>
-                      <DialogTrigger asChild>
-                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                          <Edit className="w-4 h-4 mr-2" />
-                          Naam wijzigen
-                        </DropdownMenuItem>
-                      </DialogTrigger>
                       <DialogContent>
                         <DialogHeader>
                           <DialogTitle>Naam wijzigen</DialogTitle>
