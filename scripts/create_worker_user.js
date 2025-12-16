@@ -49,24 +49,28 @@ async function createWorkerUser(email, password, name) {
         const existingUser = existingUsers?.users.find((u) => u.email?.toLowerCase() === email.toLowerCase())
         
         if (existingUser) {
-          // Update user metadata
+          // Update user metadata and confirm email
           const { error: updateError } = await supabase.auth.admin.updateUserById(existingUser.id, {
             user_metadata: {
               name: name,
               role: "worker",
             },
+            email_confirm: true, // Ensure email is confirmed
           })
 
           if (updateError) {
             console.log("Note: Could not update user metadata:", updateError.message)
+          } else {
+            console.log("✓ Email confirmed and metadata updated")
           }
 
           // Update password if needed
           try {
             await supabase.auth.admin.updateUserById(existingUser.id, {
               password: password,
+              email_confirm: true, // Also confirm email when updating password
             })
-            console.log("✓ Password updated")
+            console.log("✓ Password updated and email confirmed")
           } catch (pwdError) {
             console.log("Note: Could not update password:", pwdError.message)
           }
