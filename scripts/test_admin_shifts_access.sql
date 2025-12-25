@@ -55,3 +55,5 @@ LEFT JOIN profiles p ON s.user_id = p.id
 WHERE s.clock_out IS NULL
 ORDER BY s.clock_in DESC;
 
+
+

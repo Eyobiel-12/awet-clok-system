@@ -11,3 +11,5 @@ JOIN profiles p ON u.id = p.id
 WHERE p.role = 'admin'
 ORDER BY u.created_at DESC;
 
+
+

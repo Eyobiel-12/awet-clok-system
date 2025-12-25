@@ -67,3 +67,5 @@ supabase db execute --file scripts/001_create_tables.sql
 supabase db status
 ```
 
+
+

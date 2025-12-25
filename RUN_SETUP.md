@@ -82,3 +82,5 @@ WHERE id = (
 2. Log out and log back in
 3. The dashboard should work properly!
 
+
+

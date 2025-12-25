@@ -70,3 +70,5 @@ When deploying, add these same variables in your platform's environment variable
 - **Project Dashboard**: https://supabase.com/dashboard/project/ltqrnbehaultyndnmjcl
 - **Database**: https://supabase.com/dashboard/project/ltqrnbehaultyndnmjcl/editor
 
+
+

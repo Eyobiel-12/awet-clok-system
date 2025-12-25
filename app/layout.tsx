@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { Toaster } from "@/components/ui/sonner"
 import { ThemeProvider } from "@/components/theme-provider"
 import { AuthErrorHandler } from "@/components/auth-error-handler"
+import { HolidayGreeting } from "@/components/holiday-greeting"
 import "./globals.css"
 
 const geist = Geist({ 
@@ -84,6 +85,7 @@ export default function RootLayout({
       <body className={`font-sans antialiased h-full overflow-x-hidden ${geist.className}`} suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <AuthErrorHandler />
+          <HolidayGreeting />
           {children}
           <Toaster richColors position="top-center" />
         </ThemeProvider>

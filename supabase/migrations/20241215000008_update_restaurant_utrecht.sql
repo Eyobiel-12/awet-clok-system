@@ -15,3 +15,5 @@ INSERT INTO restaurant (name, lat, lng, radius_m)
 VALUES ('Massawa Restaurant', 52.0907, 5.1214, 100)
 ON CONFLICT DO NOTHING;
 
+
+

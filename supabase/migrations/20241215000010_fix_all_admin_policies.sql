@@ -15,3 +15,5 @@ DROP POLICY IF EXISTS "Admins can modify all shifts" ON shifts;
 CREATE POLICY "Admins can modify all shifts" ON shifts
   FOR ALL USING (public.is_admin());
 
+
+

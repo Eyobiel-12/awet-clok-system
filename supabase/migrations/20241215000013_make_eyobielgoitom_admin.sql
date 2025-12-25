@@ -15,3 +15,5 @@ FROM auth.users u
 JOIN profiles p ON u.id = p.id
 WHERE u.email = 'Eyobielgoitom10@gmail.com';
 
+
+

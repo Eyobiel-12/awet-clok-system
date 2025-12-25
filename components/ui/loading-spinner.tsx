@@ -16,3 +16,5 @@ export function LoadingSpinner({ className, size = "md" }: LoadingSpinnerProps) 
   return <Loader2 className={cn("animate-spin", sizeClasses[size], className)} />
 }
 
+
+

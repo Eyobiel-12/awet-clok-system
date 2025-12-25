@@ -114,3 +114,5 @@ Check the browser console (F12) and terminal for error messages. Common issues:
 - Database connection issues
 - RLS policies blocking access
 
+
+

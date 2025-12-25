@@ -1,4 +1,4 @@
-# Your Environment Variables for Deployment
+w# Your Environment Variables for Deployment
 
 ## ✅ Required Variables (Copy these to your deployment platform)
 
@@ -50,4 +50,6 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhY
 - ✅ `NEXT_PUBLIC_*` variables are safe to expose (public keys)
 - ❌ Never commit `.env.local` to git (it's in `.gitignore`)
 - 🔒 Service Role Key should be kept secret (only use server-side)
+
+
 

@@ -63,3 +63,5 @@ FROM auth.users u
 JOIN profiles p ON u.id = p.id
 WHERE LOWER(u.email) = LOWER('Awettesfazgi20@gmail.com');
 
+
+

@@ -38,3 +38,5 @@ CREATE POLICY "Only admins can delete restaurant" ON restaurant
 -- Grant execute on the function to authenticated users
 GRANT EXECUTE ON FUNCTION public.is_admin() TO authenticated;
 
+
+

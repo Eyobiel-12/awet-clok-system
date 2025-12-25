@@ -32,3 +32,5 @@ ORDER BY policyname;
 -- File size limit: 5MB
 -- Allowed MIME types: image/jpeg, image/png, image/gif, image/webp
 
+
+

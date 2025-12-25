@@ -32,3 +32,5 @@ CREATE POLICY "Admins can modify all shifts" ON shifts
     (SELECT role FROM profiles WHERE id = auth.uid()) = 'admin'
   );
 
+
+

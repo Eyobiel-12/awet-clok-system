@@ -48,3 +48,5 @@ FROM pg_policies
 WHERE tablename = 'shifts'
 ORDER BY policyname;
 
+
+
