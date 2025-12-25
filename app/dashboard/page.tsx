@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout"
 import { ClockButton } from "@/components/dashboard/clock-button"
+import { QRScanButton } from "@/components/dashboard/qr-scan-button"
 import { ShiftHistory } from "@/components/dashboard/shift-history"
 import { QuickStats } from "@/components/dashboard/quick-stats"
 import { getActiveShift, getShiftHistory, getRestaurantLocation } from "@/app/actions/shifts"
@@ -67,6 +68,9 @@ export default async function DashboardPage() {
 
         {/* Clock In/Out Card */}
         <ClockButton activeShift={activeShift} restaurant={restaurant} />
+
+        {/* QR Scan Card */}
+        <QRScanButton hasActiveShift={!!activeShift} />
 
         {/* Quick Stats */}
         <QuickStats shifts={shiftHistory} />

@@ -29,7 +29,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { Clock, LogOut, Settings, LayoutDashboard, Shield, Users, ChevronDown, Moon, Sun } from "lucide-react"
+import { Clock, LogOut, Settings, LayoutDashboard, Shield, Users, ChevronDown, Moon, Sun, QrCode } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -56,6 +56,12 @@ const menuItems = [
     url: "/admin/shifts",
     icon: Clock,
     shortcut: "S",
+  },
+  {
+    title: "QR Code",
+    url: "/admin/qr-code",
+    icon: QrCode,
+    shortcut: "Q",
   },
   {
     title: "Medewerkers",
